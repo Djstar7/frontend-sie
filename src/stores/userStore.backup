@@ -1,0 +1,117 @@
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import router from '@/router'
+import { userService } from '@/services/userService'
+import type { UserLogin, UserRegister, Custom } from '@/types/user'
+import { safeParse } from '@/utils/convert'
+import { toastSuccess } from '@/utils/toastConfig'
+import { useLoading } from '@/utils/startLoading'
+
+export const useUserStore = defineStore('user', () => {
+  const user = ref<UserRegister | null>(safeParse(localStorage.getItem('user')))
+  const custom = ref<Custom | null>(safeParse(localStorage.getItem('custom')))
+  const isAuthenticated = ref(!!user.value)
+  const loading = useLoading()
+  const error = ref<string | null>(null)
+
+  const role = computed(() => user.value?.role)
+
+  function setAuth(u: UserRegister) {
+    user.value = u
+    isAuthenticated.value = true
+    localStorage.setItem('user', JSON.stringify(u))
+  }
+
+  function resetAuth() {
+    user.value = null
+    custom.value = null
+    isAuthenticated.value = false
+    localStorage.removeItem('user')
+    localStorage.removeItem('custom')
+  }
+
+  async function redirectDashboard() {
+    if (!user.value?.role) return
+    const role = user.value.role
+
+    const routes: Record<string, string> = {
+      admin: 'admin.dashboard',
+      custom: 'custom.dashboard',
+      agent: 'agent.users',
+    }
+
+    await router.push({ name: routes[role] ?? 'auth.login' })
+  }
+
+  async function register(data: UserRegister) {
+    loading.startLoading('Enregistrement en cours')
+    try {
+      const response = await userService.register(data)
+      setAuth(data)
+      await redirectDashboard()
+      toastSuccess('Inscription réussie')
+      return response
+    } catch (err) {
+      loading.handleError(err, "Échec de l'enregistrement")
+      throw err
+    } finally {
+      loading.stopLoading()
+    }
+  }
+
+  async function login(credentials: UserLogin) {
+    loading.startLoading('Connexion en cours')
+    try {
+      const response = await userService.login(credentials)
+      setAuth(response.user)
+      await redirectDashboard()
+      toastSuccess('Connexion réussie')
+      return response
+    } catch (err) {
+      loading.handleError(err, 'Échec de la connexion. Vérifiez vos identifiants.')
+      throw err
+    } finally {
+      loading.stopLoading()
+    }
+  }
+
+  async function logout() {
+    loading.startLoading('Déconnexion en cours')
+    try {
+      await userService.logout()
+      resetAuth()
+      toastSuccess('Déconnexion réussie')
+      await router.push({ name: 'auth.login' })
+    } catch (err) {
+      loading.handleError(err, 'Erreur lors de la déconnexion')
+    } finally {
+      loading.stopLoading()
+    }
+  }
+
+  async function refresh() {
+    try {
+      const response = await userService.refresh()
+      setAuth(response.user)
+      return response
+    } catch (err) {
+      resetAuth()
+      throw err
+    }
+  }
+
+  return {
+    user,
+    custom,
+    isAuthenticated,
+    loading,
+    error,
+    role,
+    register,
+    login,
+    logout,
+    refresh,
+    setAuth,
+    resetAuth,
+  }
+})

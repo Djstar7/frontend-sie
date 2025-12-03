@@ -1,0 +1,36 @@
+html,
+body,
+#app {
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+/* Font Awesome */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+/* Variables CSS pour les couleurs personnalisées */
+:root {
+  --color-primary: #3b82f6; /* blue-500 */
+  --color-secondary: #f97316; /* orange-400 */
+  --color-accent: #7c3aed; /* purple-600 */
+  --color-error: #ef4444; /* red-500 */
+  --color-bg: #ffffff; /* blanc par défaut */
+}
+
+/* Classes utilitaires personnalisées */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+.bg-accent {
+  background-color: var(--color-accent);
+}
+.bg-error {
+  background-color: var(--color-error);
+}
+.bg-base {
+  background-color: var(--color-bg);
+}

@@ -1,0 +1,148 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import type { UserLogin } from '@/types/user'
+import SuccessErrorModal from '@/components/SuccessErrorModal.vue'
+import { validateForm, isEmail, isPassword, required } from '@/utils/validateForm'
+
+const form = ref<UserLogin>({
+  email: '',
+  password: '',
+})
+
+const showPassword = ref(false)
+const userStore = useUserStore()
+const showLoginModal = ref(false)
+const loginModalType = ref<'success' | 'error'>('success')
+const loginModalMessage = ref('')
+
+const validate = () => {
+  const { isValid, errors } = validateForm(form.value, {
+    email: [required('L\'email est obligatoire'), isEmail()],
+    password: [required('Le mot de passe est obligatoire'), isPassword()],
+  })
+
+  if (!isValid) {
+    for (const key in errors) {
+      if (Object.prototype.hasOwnProperty.call(errors, key)) {
+        const errorMessages = errors[key as keyof typeof errors]
+        if (errorMessages && errorMessages.length > 0) {
+          showLoginModal.value = true
+          loginModalType.value = 'error'
+          loginModalMessage.value = errorMessages[0]
+          return false
+        }
+      }
+    }
+  }
+
+  return isValid
+}
+
+const handleLogin = async () => {
+  if (!validate()) return
+
+  try {
+    const res = await userStore.login(form.value)
+    showLoginModal.value = true
+    loginModalType.value = 'success'
+    loginModalMessage.value = res.message
+  } catch (err: any) {
+    showLoginModal.value = true
+    loginModalType.value = 'error'
+    loginModalMessage.value = userStore.error || 'Erreur lors de la connexion'
+  }
+}
+
+const closeModal = () => {
+  showLoginModal.value = false
+}
+</script>
+
+<template>
+  <h2 class="text-3xl font-bold text-center text-purple-600 mb-6">Connexion</h2>
+  <form @submit.prevent="handleLogin" class="space-y-4">
+    <!-- Email -->
+    <div class="relative">
+      <label for="email" class="block text-md font-medium text-gray-700">Email</label>
+      <i class="fas fa-envelope absolute left-3 top-10 text-gray-400"></i>
+      <input
+        type="email"
+        id="email"
+        v-model="form.email"
+        placeholder="exemple@email.com"
+        class="mt-1 block w-full pl-10 px-4 py-2 text-xl border border-gray-300 rounded-md shadow-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 md:text-md"
+      />
+    </div>
+
+    <!-- Password -->
+    <div class="relative">
+      <label for="password" class="block text-md font-medium text-gray-700">Mot de passe</label>
+      <i class="fas fa-lock absolute left-3 top-10 text-gray-400"></i>
+      <input
+        :type="showPassword ? 'text' : 'password'"
+        id="password"
+        v-model="form.password"
+        placeholder="Votre mot de passe"
+        class="mt-1 block w-full pl-10 pr-10 py-2 text-xl border border-gray-300 rounded-md shadow-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 md:text-md"
+      />
+      <i
+        :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+        @click="showPassword = !showPassword"
+        class="absolute right-3 top-10 text-gray-700 cursor-pointer"
+      ></i>
+    </div>
+
+    <!-- Forgot Password -->
+    <p class="w-full flex items-end justify-end">
+      <router-link
+        :to="{ name: 'auth.forgotpassword' }"
+        class="text-purple-600 hover:text-orange-400"
+      >
+        Mot de passe oublié ?
+      </router-link>
+    </p>
+
+    <!-- Error Message -->
+    <div v-if="userStore.error" class="text-red-600 text-md mt-2">
+      {{ userStore.error }}
+    </div>
+
+    <!-- Submit Button -->
+    <div>
+      <button
+        type="submit"
+        :disabled="userStore.loading"
+        class="w-full flex items-center justify-center gap-2 py-2 px-4 text-lg font-medium text-white rounded-xl shadow-md transition-colors duration-300 bg-indigo-600 hover:bg-orange-400 disabled:opacity-70 disabled:cursor-not-allowed"
+      >
+        <span v-if="userStore.loading" class="flex items-center gap-2">
+          <i class="fas fa-spinner fa-spin"></i>
+          Connexion...
+        </span>
+        <span v-else class="flex items-center gap-2">
+          <i class="fas fa-sign-in-alt"></i>
+          Se connecter
+        </span>
+      </button>
+    </div>
+  </form>
+
+  <!-- Register Link -->
+  <p class="mt-6 text-md text-gray-600">
+    Pas encore de compte ?
+    <router-link
+      :to="{ name: 'auth.register' }"
+      class="font-medium text-indigo-600 hover:text-orange-400"
+    >
+      S'inscrire
+    </router-link>
+  </p>
+
+  <!-- Success/Error Modal -->
+  <!-- <SuccessErrorModal
+    :isOpen="showLoginModal"
+    :type="loginModalType"
+    :message="loginModalMessage"
+    @close="closeModal"
+  /> -->
+</template>

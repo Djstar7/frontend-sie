@@ -1,0 +1,215 @@
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { uploadFile } from '@/services/api'
+import { allDocument } from '@/utils/data'
+import { toastError, toastSuccess } from '@/utils/toastConfig'
+import type { DocumentItem } from '@/types/document'
+import { useVisaStore } from '@/stores/visaStore'
+
+const visaStore = useVisaStore()
+const documentSend = ref<string[] | undefined>([])
+
+onMounted(async () => {
+  documentSend.value = visaStore.visa.value?.documents
+  console.log(documentSend)
+})
+
+const route = useRoute()
+const router = useRouter()
+
+interface RouteParams {
+  visaRequestId?: string
+}
+
+const uploadedFiles = ref<Record<string, File | null>>({})
+const docErrors = ref<Record<string, string | null>>({})
+const documentRecieve = ref<string[]>([])
+
+const isSingle = computed(() => documentSend.value && documentSend.value.length === 1)
+
+const allDocuments = allDocument
+type DocumentCategory = keyof typeof allDocument
+const categories = Object.keys(allDocuments) as DocumentCategory[]
+
+let targetDoc: DocumentItem | null = null
+if (isSingle.value && documentSend) {
+  const docName = documentSend.value[0]
+  for (const category of categories) {
+    const found = allDocuments[category].find((d) => d.name === docName)
+    if (found) {
+      targetDoc = found
+      break
+    }
+  }
+}
+
+const storedVisa = localStorage.getItem('visa')
+if (storedVisa) {
+  const parsedVisa = JSON.parse(storedVisa)
+  documentRecieve.value = parsedVisa.documents || []
+}
+
+const requiredDocs = computed(() => {
+  if (!isSingle.value) {
+    const result: Partial<Record<DocumentCategory, DocumentItem[]>> = {}
+    for (const category of categories) {
+      const filtered = allDocuments[category].filter((d) => documentRecieve.value.includes(d.name))
+      if (filtered.length) result[category] = filtered
+    }
+    return result
+  }
+  return {}
+})
+
+function onFileChange(event: Event, docName: string) {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+    uploadedFiles.value[docName] = input.files[0]
+    docErrors.value[docName] = null
+  }
+}
+
+function validateFile(file: File, doc: DocumentItem): string | null {
+  const ext = file.name.split('.').pop()?.toLowerCase() || ''
+  if (!doc.validation.fileTypes.includes(ext)) {
+    return `Format invalide (${ext}), attendu: ${doc.validation.fileTypes.join(', ')}`
+  }
+  if (file.size / 1024 / 1024 > doc.validation.maxSizeMB) {
+    return `Taille trop grande (> ${doc.validation.maxSizeMB} MB)`
+  }
+  return null
+}
+
+async function submitAll() {
+  const params = route.params as RouteParams
+  const visaRequestId = params.visaRequestId
+
+  if (!visaRequestId) {
+    toastError('ID de la demande de visa manquant.')
+    return router.push({ name: 'custom.visarequest.create' })
+  }
+
+  let hasErrors = false
+  const validFiles: { doc: DocumentItem; file: File }[] = []
+
+  for (const category in requiredDocs.value) {
+    const docs = requiredDocs.value[category as DocumentCategory]
+    if (!docs) continue
+
+    for (const doc of docs) {
+      const file = uploadedFiles.value[doc.name]
+
+      if (!file && doc.validation.required) {
+        docErrors.value[doc.name] = `${doc.name} est requis`
+        hasErrors = true
+        continue
+      }
+
+      if (file) {
+        const error = validateFile(file, doc)
+        if (error) {
+          docErrors.value[doc.name] = error
+          hasErrors = true
+          continue
+        }
+        validFiles.push({ doc, file })
+      }
+    }
+  }
+
+  if (hasErrors) return toastError('Corrigez les erreurs avant de soumettre.')
+
+  try {
+    for (const { doc, file } of validFiles) {
+      const formData = new FormData()
+      formData.append('visa_request_id', visaRequestId)
+      formData.append('name', doc.name)
+      formData.append('document_file', file)
+      console.log('Uploading', formData)
+
+      await uploadFile('/document/store', formData)
+    }
+
+    toastSuccess('Documents soumis avec succès.')
+    // router.push({ name: 'custom.visarequest.show.get', params: { id: visaRequestId } })
+  } catch (error) {
+    console.error(error)
+  }
+}
+</script>
+
+<template>
+  <div class="min-h-screen bg-gray-50 flex flex-col items-center py-10 px-4">
+    <div class="w-full max-w-5xl">
+      <h1 class="text-3xl font-bold mb-10 text-purple-600 text-center">
+        <i class="fas fa-file mr-2"></i>
+        {{ isSingle ? 'Upload du document requis' : 'Upload des documents requis' }}
+      </h1>
+
+      <!-- Mode single -->
+      <div
+        v-if="isSingle && targetDoc"
+        class="bg-white rounded-2xl shadow-md p-6 max-w-2xl mx-auto"
+      >
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">{{ targetDoc.name }}</h3>
+        <p class="text-gray-500 mb-4 text-sm italic">
+          {{ targetDoc.guide }} (max {{ targetDoc.validation.maxSizeMB }} Mo, Types:
+          {{ targetDoc.validation.fileTypes.join(', ') }})
+        </p>
+        <input
+          type="file"
+          @change="onFileChange($event, targetDoc.name)"
+          class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-purple-500 transition"
+        />
+        <p v-if="docErrors[targetDoc.name]" class="text-red-500 text-sm mt-2">
+          {{ docErrors[targetDoc.name] }}
+        </p>
+
+        <div class="flex justify-center mt-6">
+          <button
+            @click="submitSingle"
+            class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-2xl shadow-md font-bold transition"
+          >
+            <i class="fas fa-sign-in mr-2"></i> Soumettre le document
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode multiple -->
+      <div v-else>
+        <div v-for="(docs, category) in requiredDocs" :key="category" class="mb-12">
+          <h2 class="text-2xl font-semibold mb-6 text-orange-500 capitalize border-b pb-2">
+            {{ category.replace(/_/g, ' ') }}
+          </h2>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div v-for="doc in docs" :key="doc.name" class="bg-white rounded-2xl shadow-md p-6">
+              <h3 class="text-lg font-semibold mb-2 text-gray-800">{{ doc.name }}</h3>
+              <p class="text-gray-500 mb-4 text-sm italic">
+                {{ doc.guide }} (max {{ doc.validation.maxSizeMB }} Mo, Types:
+                {{ doc.validation.fileTypes.join(', ') }})
+              </p>
+              <input
+                type="file"
+                @change="onFileChange($event, doc.name)"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-purple-500 transition"
+              />
+              <p v-if="docErrors[doc.name]" class="text-red-500 text-sm mt-2">
+                {{ docErrors[doc.name] }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center mt-6">
+          <button
+            @click="submitAll"
+            class="bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 rounded-2xl shadow-md font-bold transition"
+          >
+            <i class="fas fa-sign-in mr-2"></i> Soumettre les documents
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

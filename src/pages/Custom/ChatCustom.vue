@@ -1,16 +1,18 @@
 <template>
-  <div class="flex h-screen md:h-[calc(100vh)] overflow-hidden antialiased text-sm bg-gray-50">
+  <div class="flex md:h-[87vh] overflow-hidden bg-gray-100 antialiased text-sm">
     <aside
-      class="flex-shrink-0 flex-col w-full xs:w-72 sm:w-80 md:w-80 lg:w-96 border-r border-gray-200 bg-white shadow-xl shadow-gray-200/50 transition-all duration-300 absolute md:relative z-40 h-full"
+      class="flex-shrink-0 flex-col w-full xs:w-72 sm:w-64 md:w-20 lg:w-80 xl:w-96 border-r border-gray-200 bg-white shadow-xl shadow-gray-200/50 transition-all duration-300 absolute md:relative z-40 h-full"
       :class="{
         flex: showList,
         'hidden md:flex': !showList,
       }"
     >
       <header class="h-16 flex items-center px-4 border-b border-gray-100/80 flex-shrink-0">
-        <h2 class="text-xl font-semibold text-gray-800 tracking-tight">
-          <i class="fas fa-comments text-blue-500 mr-2"></i>
-          Mes Demandes
+        <h2
+          class="text-xl md:text-base lg:text-xl font-semibold text-gray-800 tracking-tight flex items-center"
+        >
+          <i class="fas fa-comments text-blue-500 mr-2 lg:mr-2"></i>
+          <span class="md:hidden lg:inline">Mes Demandes</span>
         </h2>
       </header>
 
@@ -36,18 +38,20 @@
             }"
           >
             <div
-              class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-white text-xs sm:text-sm mr-3 sm:mr-4"
+              class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 lg:w-10 lg:h-10 rounded-full flex items-center justify-center font-bold text-white text-xs sm:text-sm mr-3 md:mr-0 lg:mr-4"
               :class="selectedVisaRequest === id ? 'bg-blue-500' : 'bg-gray-400'"
             >
               #
             </div>
-            <div class="flex-1 min-w-0">
+
+            <div class="flex-1 min-w-0 md:hidden lg:block">
               <p class="font-medium text-gray-800 truncate text-sm">Demande #{{ id }}</p>
               <p class="text-xs text-gray-500 truncate mt-0.5">Cliquez pour ouvrir le chat</p>
             </div>
+
             <span
               v-if="selectedVisaRequest === id"
-              class="text-xs font-semibold text-blue-600 ml-2"
+              class="text-xs font-semibold text-blue-600 ml-2 md:ml-0 lg:ml-2"
               title="Chat Actif"
             >
               <i class="fas fa-check-circle"></i>
@@ -56,30 +60,35 @@
         </TransitionGroup>
       </div>
 
-      <div v-else class="p-6 text-center text-gray-400 italic mt-4">
-        <p class="text-sm">Vous n'avez pas encore de demandes.</p>
-        <p class="text-xs mt-1">C'est ici qu'elles apparaîtront.</p>
+      <div v-else class="p-6 md:p-3 lg:p-6 text-center text-gray-400 italic mt-4">
+        <p class="text-sm md:hidden lg:block">Vous n'avez pas encore de demandes.</p>
+        <p class="text-xs mt-1 md:hidden lg:block">C'est ici qu'elles apparaîtront.</p>
+        <p class="text-sm hidden md:block lg:hidden">Aucune demande.</p>
       </div>
     </aside>
 
     <main
       class="flex-1 flex flex-col min-w-0 h-full transition-all duration-300"
-      :class="{ 'hidden sm:flex': showList && isMobile }"
+      :class="{
+        // Correction UX : Sur mobile, n'afficher la conversation QUE si showList est faux
+        hidden: showList && isMobile,
+        flex: !showList || !isMobile,
+      }"
     >
       <div
         v-if="!selectedVisaRequest"
-        class="flex-1 flex items-center justify-center bg-gray-100/70"
+        class="flex-1 flex items-center justify-center bg-gray-100/70 p-4 sm:p-6"
       >
         <div class="text-center text-gray-500 max-w-xs sm:max-w-sm px-4">
           <i class="fas fa-laptop-code text-5xl sm:text-6xl text-gray-300 mb-4"></i>
           <h3 class="text-lg sm:text-xl font-semibold mb-2">Bienvenue au Centre d'Assistance</h3>
-          <p class="text-sm">
+          <p class="text-sm sm:text-base">
             Sélectionnez une demande dans la barre latérale pour démarrer la discussion.
           </p>
           <button
             v-if="isMobile"
             @click="showList = true"
-            class="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm shadow-md hover:bg-orange-600 transition"
+            class="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm shadow-md hover:bg-orange-600 transition w-full"
           >
             <i class="fas fa-list-ul mr-2"></i> Voir les Demandes
           </button>
@@ -94,7 +103,7 @@
             <button
               v-if="isMobile"
               @click="showList = true"
-              class="mr-3 text-gray-600 hover:text-orange-600 transition"
+              class="mr-3 text-gray-600 hover:text-orange-600 transition p-1"
               title="Afficher la liste des demandes"
             >
               <i class="fas fa-arrow-left text-lg sm:text-xl"></i>
@@ -116,14 +125,14 @@
             </span>
           </div>
           <router-link
-            class="text-gray-500 hover:text-blue-600 transition duration-150 flex-shrink-0"
+            class="text-gray-500 hover:text-blue-600 transition duration-150 flex-shrink-0 p-1"
             :to="{
               name: 'custom.visarequest.show.get',
               params: { visaRequestId: selectedVisaRequest },
             }"
             title="Voir les détails de la demande"
           >
-            <i class="fas fa-info-circle text-xl"></i>
+            <i class="fas fa-info-circle text-xl sm:text-2xl"></i>
           </router-link>
         </header>
 
@@ -133,7 +142,7 @@
           @scroll="onScroll"
         >
           <div
-            class="p-4 sm:p-6 space-y-3 sm:space-y-4 max-w-full mx-auto md:max-w-4xl lg:max-w-5xl"
+            class="p-4 space-y-3 sm:space-y-4 max-w-full mx-auto md:max-w-3xl lg:max-w-4xl xl:max-w-5xl"
           >
             <div v-if="messages.length === 0" class="flex justify-center pt-4 sm:pt-8">
               <div
@@ -185,7 +194,7 @@
               <div
                 @click="selectMessageToComment(msg)"
                 :class="[
-                  'p-2.5 sm:p-3 max-w-[85%] xs:max-w-[80%] sm:max-w-[70%] md:max-w-[60%] break-words whitespace-pre-wrap relative text-sm sm:text-base shadow-md cursor-pointer transition-all duration-100 ease-out',
+                  'p-2.5 sm:p-3 max-w-[90%] xs:max-w-[85%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%] break-words whitespace-pre-wrap relative text-sm sm:text-base shadow-md cursor-pointer transition-all duration-100 ease-out',
                   msg?.source == 'custom'
                     ? 'bg-[#d9fdd3] text-gray-900 rounded-xl rounded-tr-sm ml-4'
                     : 'bg-white text-gray-900 rounded-xl rounded-tl-sm mr-4 border border-gray-100/60',
@@ -237,7 +246,13 @@
               <span class="font-semibold">{{ selectMessage.content.substring(0, 30) }}...</span>
             </span>
             <button
-              @click="opdeModif"
+              @click="
+                () => {
+                  newMessage = ''
+                  isEdit = false
+                  selectMessage = null
+                }
+              "
               class="text-white opacity-70 hover:opacity-100 transition flex-shrink-0"
               title="Annuler la modification"
             >
@@ -249,7 +264,7 @@
             :rows="Math.min(5, Math.max(1, newMessage.split('\n').length))"
             type="text"
             placeholder="Écrivez un message ici..."
-            class="flex-1 resize-none border-0 bg-white rounded-xl px-4 py-2.5 shadow-inner-sm focus:ring-2 focus:ring-blue-400/50 focus:border-blue-500 focus:outline-none transition duration-150 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white text-sm"
+            class="flex-1 resize-none border-0 bg-white rounded-xl px-4 py-2.5 shadow-inner-sm focus:ring-2 focus:ring-blue-400/50 focus:border-blue-500 focus:outline-none transition duration-150 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white text-sm sm:text-base"
             @keyup.enter.prevent="isEdit ? editMessageSend() : sendMessage()"
             :disabled="!selectedVisaRequest"
           ></textarea>
@@ -300,7 +315,7 @@
             {{ (hoveredVisaDetails as any).visa_type_name }}
           </div>
           <router-link
-            class="text-blue-600 hover:text-blue-700 font-medium transition duration-150 block mt-2"
+            class="text-blue-600 hover:text-blue-700 font-medium transition duration-150 block mt-2 text-xs sm:text-sm"
             :to="{
               name: 'custom.visarequest.show.get',
               params: { visaRequestId: hoveredVisaDetails.id },
@@ -323,6 +338,10 @@
 </template>
 
 <script setup lang="ts">
+// ... Le script VUE.JS est conservé à l'identique car la logique
+// de bascule (showList) et de détection mobile (isMobile)
+// est déjà correctement implémentée pour supporter les changements du template.
+
 import { ref, onMounted, nextTick, onBeforeUnmount, watch, computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useVisaRequestStore } from '@/stores/visaRequestStore'
@@ -602,15 +621,19 @@ const selectMessageToComment = (msg: Chat) => {
 }
 
 const handleResize = () => {
+  // Sur un redimensionnement, si ce n'est plus mobile, s'assurer que la liste est affichée.
   if (!isMobile.value) {
     showList.value = true
   }
 }
 
 watch(isMobile, (newIsMobile) => {
+  // Si on passe en mode mobile et une demande est sélectionnée, masquer la liste
   if (newIsMobile && selectedVisaRequest.value) {
     showList.value = false
-  } else if (!newIsMobile) {
+  }
+  // Si on quitte le mode mobile, afficher la liste
+  else if (!newIsMobile) {
     showList.value = true
   }
 })
@@ -631,8 +654,13 @@ onMounted(async () => {
 
     if (route.params.visaRequestId) {
       loadMessages(route.params.visaRequestId as string)
+      // Au chargement initial, si mobile et une demande est sélectionnée, on affiche le chat.
       if (isMobile.value) showList.value = false
     } else if (isMobile.value) {
+      // Si mobile et aucune demande sélectionnée, on affiche la liste.
+      showList.value = true
+    } else {
+      // Sur desktop, on affiche toujours la liste
       showList.value = true
     }
   } catch (err) {
@@ -653,6 +681,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* ... Les styles restent inchangés et sont toujours valides pour la fonctionnalité scrollbar, pop-up, etc. */
+
 .bg-\[\#e5ddd5\] {
   background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="wa-pattern" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 0 10 L 10 10 L 10 0" fill="none" stroke="%23c2c2c2" stroke-width="0.3"></path><path d="M 30 0 L 30 10 L 40 10" fill="none" stroke="%23c2c2c2" stroke-width="0.3"></path><path d="M 0 30 L 10 30 L 10 40" fill="none" stroke="%23c2c2c2" stroke-width="0.3"></path><path d="M 30 40 L 40 40 L 40 30" fill="none" stroke="%23c2c2c2" stroke-width="0.3"></path></pattern></defs><rect width="100%" height="100%" fill="%23e5ddd5"></rect><rect width="100%" height="100%" fill="url(%23wa-pattern)"></rect></svg>');
   background-color: #e5ddd5;

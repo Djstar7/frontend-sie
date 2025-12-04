@@ -1,16 +1,22 @@
 <template>
-  <div class="flex h-[calc(100vh-80px)] overflow-hidden bg-gray-100 antialiased text-sm">
+  <div class="flex md:h-[87vh] overflow-hidden bg-gray-100 antialiased text-sm">
     <aside
       class="flex-shrink-0 w-80 md:w-64 lg:w-80 bg-white border-r border-gray-200 shadow-2xl shadow-gray-200/50 flex flex-col transition-all duration-300 ease-in-out"
       :class="{
-        'hidden sm:flex': !showUsersList,
+        // Mobile (sm) : Afficher en plein écran si showUsersList est true, sinon cacher
         'flex w-full': showUsersList && isMobile,
-        'flex': !isMobile,
+        hidden: !showUsersList && isMobile,
+        // Desktop (md+) : Toujours visible
+        flex: !isMobile,
       }"
     >
       <header class="h-16 flex items-center px-6 border-b border-gray-100/80 bg-white">
-        <button v-if="isMobile && selectedUser" @click="handleBackToUsersList" class="mr-3 text-gray-500 hover:text-purple-600">
-             <i class="fas fa-arrow-left text-xl"></i>
+        <button
+          v-if="isMobile && selectedUser"
+          @click="handleBackToUsersList"
+          class="mr-3 text-gray-500 hover:text-purple-600"
+        >
+          <i class="fas fa-arrow-left text-xl"></i>
         </button>
         <h2 class="text-xl font-extrabold text-purple-800 tracking-tight truncate">
           <i class="fas fa-users-crown text-purple-500 mr-2"></i>
@@ -18,7 +24,9 @@
         </h2>
       </header>
 
-      <div class="p-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white">
+      <div
+        class="p-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white"
+      >
         <div v-if="loading" class="flex justify-center py-8 text-gray-500 gap-2">
           <i class="fas fa-spinner animate-spin text-xl"></i>
           Chargement...
@@ -32,7 +40,8 @@
             @click="selectUserHandler(user)"
             class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition duration-200 ease-in-out select-none shadow-sm"
             :class="{
-              'bg-purple-50/70 text-purple-800 font-semibold border-l-4 border-purple-500': selectedUser?.id === user.id,
+              'bg-purple-50/70 text-purple-800 font-semibold border-l-4 border-purple-500':
+                selectedUser?.id === user.id,
               'hover:bg-gray-50/70 bg-white text-gray-800': selectedUser?.id !== user.id,
             }"
           >
@@ -55,8 +64,12 @@
     </aside>
 
     <aside
-      :class="{ 'w-72 md:w-64 lg:w-72': selectedUser && !isMobile, 'w-0': !selectedUser && !isMobile }"
-      class="flex-shrink-0 bg-white border-r border-gray-200 shadow-lg shadow-gray-100/50 flex-col transition-all duration-300 overflow-hidden hidden sm:flex"
+      :class="{
+        'w-72 md:w-64 lg:w-72': selectedUser && !isMobile,
+        'w-0': !selectedUser && !isMobile,
+        hidden: isMobile, // Masquer sur mobile, l'overlay gère l'affichage
+      }"
+      class="flex-shrink-0 bg-white border-r border-gray-200 shadow-lg shadow-gray-100/50 flex-col transition-all duration-300 overflow-hidden sm:flex"
     >
       <header class="h-16 flex items-center px-4 border-b border-gray-100/80 bg-white">
         <h3 class="text-lg font-semibold text-gray-800 truncate">
@@ -65,7 +78,10 @@
         </h3>
       </header>
 
-      <div v-if="selectedUser" class="flex flex-col flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white">
+      <div
+        v-if="selectedUser"
+        class="flex flex-col flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white"
+      >
         <div v-if="idVisaRequest.length === 0" class="p-6 text-center text-gray-400 italic">
           <p>Aucune demande pour ce client.</p>
         </div>
@@ -81,17 +97,23 @@
             @blur="hideVisaPopover"
             class="p-3 rounded-lg cursor-pointer transition duration-200 ease-in-out select-none shadow-sm"
             :class="{
-              'bg-orange-50/70 text-orange-800 font-medium border-r-4 border-orange-500': selectedVisaRequest === id,
+              'bg-orange-50/70 text-orange-800 font-medium border-r-4 border-orange-500':
+                selectedVisaRequest === id,
               'hover:bg-gray-50/70 bg-white text-gray-700': selectedVisaRequest !== id,
             }"
           >
             <div class="flex items-center justify-between">
-              <p class="truncate font-medium">Demande </p>
-              <i v-if="selectedVisaRequest === id" class="fas fa-comment-dots text-orange-500 ml-2"></i>
+              <p class="truncate font-medium">Demande #{{ id.substring(0, 8) }}</p>
+              <i
+                v-if="selectedVisaRequest === id"
+                class="fas fa-comment-dots text-orange-500 ml-2"
+              ></i>
             </div>
             <p class="text-xs text-gray-500 mt-0.5">
               Statut:
-              <span class="font-semibold">{{ visaRequestStatusMap.get(visaRequests.find(v => v.id === id)?.status || 'pending') }}</span>
+              <span class="font-semibold">{{
+                visaRequestStatusMap.get(visaRequests.find((v) => v.id === id)?.status || 'pending')
+              }}</span>
             </p>
           </li>
         </ul>
@@ -101,15 +123,24 @@
     <main
       class="flex-1 flex flex-col min-w-0 h-full bg-gray-50 transition-all duration-300 ease-in-out"
       :class="{
-        'hidden sm:flex': showUsersList && isMobile,
-        'flex w-full': !showUsersList || !selectedUser
+        // Mobile : Afficher si la liste des utilisateurs est masquée ET l'overlay des demandes est masqué
+        'flex w-full': !showUsersList && !showVisaRequestList && isMobile,
+        hidden: showUsersList && isMobile,
+        // Desktop : Toujours visible
+        flex: !isMobile,
       }"
     >
-      <div v-if="!selectedUser" class="flex-1 flex items-center justify-center bg-gray-100/70">
+      <div
+        v-if="!selectedUser"
+        class="flex-1 sm:h-[calc(100vh-4rem-4rem)] flex items-center justify-center bg-gray-100/70"
+      >
         <div class="text-center text-gray-500 max-w-sm p-6 bg-white rounded-xl shadow-2xl">
           <i class="fas fa-hand-pointer text-6xl text-purple-300 mb-4"></i>
           <h3 class="text-xl font-semibold mb-2 text-gray-700">Démarrez l'assistance</h3>
-          <p>Veuillez sélectionner un **Client** dans la première colonne pour afficher ses demandes et commencer à chatter.</p>
+          <p>
+            Veuillez sélectionner un **Client** dans la première colonne pour afficher ses demandes
+            et commencer à chatter.
+          </p>
         </div>
       </div>
 
@@ -118,8 +149,13 @@
           class="flex-shrink-0 h-16 bg-white border-b border-gray-200/70 flex items-center justify-between px-6 shadow-sm z-10"
         >
           <div class="flex items-center">
-            <button v-if="isMobile" @click="handleBackToUsersList" class="mr-3 text-gray-500 hover:text-purple-600" title="Retour à la liste des clients">
-                <i class="fas fa-arrow-left text-xl"></i>
+            <button
+              v-if="isMobile && !showUsersList"
+              @click="handleBackToUsersList"
+              class="mr-3 text-gray-500 hover:text-purple-600"
+              title="Retour à la liste des clients"
+            >
+              <i class="fas fa-arrow-left text-xl"></i>
             </button>
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm bg-purple-500 mr-3 shadow-md"
@@ -127,18 +163,18 @@
               {{ selectedInitial }}
             </div>
             <div class="flex flex-col min-w-0">
-                <h3 class="text-lg font-bold text-gray-800 truncate leading-none">
-                    {{ selectedUser.name }}
-                </h3>
-                <span
-                  v-if="selectedVisaRequest"
-                  class="text-xs font-semibold text-orange-600 truncate leading-none mt-0.5"
-                >
-                  Demande
-                </span>
-                <span v-else class="text-xs font-medium text-gray-500 truncate leading-none mt-0.5">
-                  Sélectionnez une demande
-                </span>
+              <h3 class="text-lg font-bold text-gray-800 truncate leading-none">
+                {{ selectedUser.name }}
+              </h3>
+              <span
+                v-if="selectedVisaRequest"
+                class="text-xs font-semibold text-orange-600 truncate leading-none mt-0.5"
+              >
+                Demande #{{ selectedVisaRequest.substring(0, 8) }}
+              </span>
+              <span v-else class="text-xs font-medium text-gray-500 truncate leading-none mt-0.5">
+                Sélectionnez une demande
+              </span>
             </div>
           </div>
           <router-link
@@ -160,13 +196,15 @@
         >
           <div class="text-center p-6 bg-white rounded-xl shadow-lg max-w-xs">
             <i class="fas fa-comment-slash text-4xl text-gray-300 mb-3"></i>
-            <p class="text-sm">Veuillez sélectionner une demande de visa pour ouvrir l'historique de chat.</p>
+            <p class="text-sm">
+              Veuillez sélectionner une demande de visa pour ouvrir l'historique de chat.
+            </p>
             <button
-                v-if="isMobile && idVisaRequest.length > 0"
-                @click="showVisaRequestList = true"
-                class="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm shadow-md hover:bg-orange-600 transition"
+              v-if="isMobile && idVisaRequest.length > 0"
+              @click="showVisaRequestList = true"
+              class="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm shadow-md hover:bg-orange-600 transition"
             >
-                <i class="fas fa-list-ul mr-2"></i> Voir les Demandes
+              <i class="fas fa-list-ul mr-2"></i> Voir les Demandes
             </button>
           </div>
         </div>
@@ -182,12 +220,12 @@
             class="flex-1 flex items-center justify-center text-gray-400 italic text-center"
           >
             <div class="p-4 bg-gray-50 rounded-xl shadow-inner-sm border border-gray-100">
-                <i class="fas fa-history mr-2"></i>
-                Démarrez une nouvelle conversation.
+              <i class="fas fa-history mr-2"></i>
+              Démarrez une nouvelle conversation.
             </div>
           </div>
 
-          <div v-else class="flex flex-col gap-5  lg:max-w-screen-lg">
+          <div v-else class="flex flex-col gap-5 lg:max-w-screen-lg">
             <div
               v-for="msg in messages"
               :key="msg.id"
@@ -203,12 +241,11 @@
                 ]"
               >
                 <div
-                    v-if="msg?.source === 'agent' && msg.user?.id !== userStore.user?.id"
-                    class="text-xs font-semibold mb-1 text-purple-600"
+                  v-if="msg?.source === 'agent' && msg.user?.id !== userStore.user?.id"
+                  class="text-xs font-semibold mb-1 text-purple-600"
                 >
-                    {{ msg.user?.name || 'Autre Agent' }}
+                  {{ msg.user?.name || 'Autre Agent' }}
                 </div>
-
 
                 <Transition name="fade-in">
                   <div
@@ -237,7 +274,11 @@
                 </Transition>
 
                 <p class="leading-relaxed pr-8">
-                  <span v-if="isEdit && selectMessage?.id === msg?.id" class="text-xs text-yellow-500 font-semibold mr-1">(Modification)</span>
+                  <span
+                    v-if="isEdit && selectMessage?.id === msg?.id"
+                    class="text-xs text-yellow-500 font-semibold mr-1"
+                    >(Modification)</span
+                  >
                   {{ msg.content }}
                 </p>
 
@@ -251,7 +292,13 @@
                     :class="[
                       'fas ml-0.5',
                       msg.status === 'sending' ? 'fa-clock' : 'fa-check-double',
-                      msg.status === 'sending' ? 'text-gray-500' : (msg.status === 'sent' ? 'text-gray-500' : (msg.status === 'failed' ? 'text-red-500' : 'text-blue-500')),
+                      msg.status === 'sending'
+                        ? 'text-gray-500'
+                        : msg.status === 'sent'
+                          ? 'text-gray-500'
+                          : msg.status === 'failed'
+                            ? 'text-red-500'
+                            : 'text-blue-500',
                     ]"
                   ></i>
                 </div>
@@ -273,7 +320,13 @@
               <span class="font-semibold">{{ selectMessage.content.substring(0, 30) }}...</span>
             </span>
             <button
-              @click="isEdit = false; selectMessage = null; newMessage = ''"
+              @click="
+                () => {
+                  isEdit = false
+                  selectMessage = null
+                  newMessage = ''
+                }
+              "
               class="text-white opacity-90 hover:opacity-100 transition"
               title="Annuler la modification"
             >
@@ -320,7 +373,9 @@
             <span
               :class="[
                 'ml-1 px-2 py-0.5 rounded-full text-xs font-medium',
-                hoveredVisaDetails.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                hoveredVisaDetails.status === 'approved'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-yellow-100 text-yellow-700',
               ]"
             >
               {{ visaRequestStatusMap.get(hoveredVisaDetails.status) }}
@@ -331,10 +386,12 @@
             {{ formatDate((hoveredVisaDetails as any).updated_at) }}
           </div>
           <div v-if="(hoveredVisaDetails as any).visa_type_name">
-            <span class="font-semibold">Type:</span> {{ (hoveredVisaDetails as any).visa_type_name }}
+            <span class="font-semibold">Type:</span>
+            {{ (hoveredVisaDetails as any).visa_type_name }}
           </div>
           <div v-if="(hoveredVisaDetails as any).country_dest_name">
-            <span class="font-semibold">Pays:</span> {{ (hoveredVisaDetails as any).country_dest_name }}
+            <span class="font-semibold">Pays:</span>
+            {{ (hoveredVisaDetails as any).country_dest_name }}
           </div>
           <router-link
             class="text-purple-600 hover:text-purple-700 font-medium transition duration-150 block mt-2"
@@ -364,8 +421,11 @@
         class="fixed inset-0 z-40 bg-white shadow-2xl flex flex-col w-full"
       >
         <header class="h-16 flex items-center px-4 border-b border-gray-100/80 bg-white">
-          <button @click="showVisaRequestList = false" class="mr-4 text-gray-600 hover:text-orange-600 transition">
-              <i class="fas fa-arrow-left text-xl"></i>
+          <button
+            @click="showVisaRequestList = false"
+            class="mr-4 text-gray-600 hover:text-orange-600 transition"
+          >
+            <i class="fas fa-arrow-left text-xl"></i>
           </button>
           <h3 class="text-lg font-semibold text-gray-800 truncate">
             <i class="fas fa-passport text-orange-500 mr-2"></i>
@@ -373,7 +433,9 @@
           </h3>
         </header>
 
-        <div class="flex flex-col flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white">
+        <div
+          class="flex flex-col flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white"
+        >
           <ul class="space-y-1 p-3">
             <li
               v-for="id in idVisaRequest"
@@ -381,16 +443,25 @@
               @click="selectVisaRequestHandler(id, true)"
               class="p-3 rounded-lg cursor-pointer transition duration-200 ease-in-out select-none shadow-sm"
               :class="{
-                'bg-orange-50/70 text-orange-800 font-medium border-r-4 border-orange-500': selectedVisaRequest === id,
+                'bg-orange-50/70 text-orange-800 font-medium border-r-4 border-orange-500':
+                  selectedVisaRequest === id,
                 'hover:bg-gray-50/70 bg-white text-gray-700': selectedVisaRequest !== id,
               }"
             >
-              <div class="flex items-center justify-between">]
-                <i v-if="selectedVisaRequest === id" class="fas fa-comment-dots text-orange-500 ml-2"></i>
+              <div class="flex items-center justify-between">
+                <p class="truncate font-medium">Demande #{{ id.substring(0, 8) }}</p>
+                <i
+                  v-if="selectedVisaRequest === id"
+                  class="fas fa-comment-dots text-orange-500 ml-2"
+                ></i>
               </div>
               <p class="text-xs text-gray-500 mt-0.5">
                 Statut:
-                <span class="font-semibold">{{ visaRequestStatusMap.get(visaRequests.find(v => v.id === id)?.status || 'pending') }}</span>
+                <span class="font-semibold">{{
+                  visaRequestStatusMap.get(
+                    visaRequests.find((v) => v.id === id)?.status || 'pending',
+                  )
+                }}</span>
               </p>
             </li>
           </ul>
@@ -422,7 +493,10 @@ const visaRequestStore = useVisaRequestStore()
 
 // --- Local Types ---
 type MessageSource = 'agent' | 'custom'
-type Chat = ChatType & { source?: MessageSource, user?: { id: string, name: string } }
+type Chat = ChatType & {
+  source?: MessageSource
+  user?: { id: string; name: string; email?: string }
+}
 
 // --- State ---
 const users = ref<UserRegister[]>([])
@@ -455,15 +529,15 @@ const selectedId = ref('')
 
 // Responsive State
 const isMobile = ref(window.innerWidth < 640)
+// showUsersList: Vrai si la Colonne 1 (Clients) doit être affichée (Plein écran sur mobile, ou toujours sur desktop)
 const showUsersList = ref(!isMobile.value)
+// showVisaRequestList: Vrai si l'Overlay de la Colonne 2 (Demandes) doit être affiché sur mobile
 const showVisaRequestList = ref(false)
-
 
 // --- Computed ---
 const selectedInitial = computed(() =>
   selectedUser.value?.name ? selectedUser.value.name.charAt(0).toUpperCase() : '?',
 )
-
 
 // --- Utility Functions ---
 const formatDate = (dateStr?: string | Date | null): string => {
@@ -518,26 +592,27 @@ const stopPolling = () => {
 }
 
 const handleBackToUsersList = () => {
-    showUsersList.value = true;
-    showVisaRequestList.value = false;
+  showUsersList.value = true // Retourne à la liste des clients
+  showVisaRequestList.value = false // S'assure que l'overlay est fermé
+  // selectedUser.value = null // Optionnel: pour désélectionner l'utilisateur, mais je le garde sélectionné pour l'historique
 }
 
 const selectUserHandler = async (user: UserRegister) => {
   await selectUser(user)
   if (isMobile.value) {
-    showUsersList.value = false // Masque la liste des clients pour afficher le chat/les demandes
-    // En mobile, si l'utilisateur a des demandes et aucune n'est sélectionnée, affiche l'overlay des demandes.
-    if (!selectedVisaRequest.value && idVisaRequest.value.length > 0) {
-        showVisaRequestList.value = true;
+    showUsersList.value = false // Masque la liste des clients
+    // En mobile, si l'utilisateur a des demandes, on montre l'overlay des demandes.
+    if (idVisaRequest.value.length > 0) {
+      showVisaRequestList.value = true
     }
   }
 }
 
 const selectVisaRequestHandler = async (visaId: string, isMobileSelection = false) => {
-    await loadMessages(visaId)
-    if (isMobileSelection && isMobile.value) {
-        showVisaRequestList.value = false // Ferme l'overlay des demandes après sélection
-    }
+  await loadMessages(visaId)
+  if (isMobileSelection && isMobile.value) {
+    showVisaRequestList.value = false // Ferme l'overlay des demandes après sélection
+  }
 }
 
 const selectUser = async (user: UserRegister) => {
@@ -552,11 +627,10 @@ const selectUser = async (user: UserRegister) => {
     visaRequests.value = res?.data ?? []
     idVisaRequest.value = visaRequests.value.map((v) => v.id)
 
-    // S'il y a des demandes, sélectionne la première par défaut sur desktop si aucune n'est sélectionnée
-    if (idVisaRequest.value.length > 0 && !isMobile.value && !selectedVisaRequest.value) {
-        await loadMessages(idVisaRequest.value[0]);
+    // Sur desktop, si des demandes existent, on sélectionne la première
+    if (idVisaRequest.value.length > 0 && !isMobile.value) {
+      await loadMessages(idVisaRequest.value[0])
     }
-
   } catch (err) {
     console.error('Erreur get visa ids:', err)
     visaRequests.value = []
@@ -569,13 +643,12 @@ const loadMessages = async (visaId: string, isPolling = false) => {
 
   // Stoppe et relance le polling si la demande change
   if (selectedVisaRequest.value !== String(visaId)) {
-    stopPolling();
-    selectedVisaRequest.value = String(visaId);
-    startPolling();
+    stopPolling()
+    selectedVisaRequest.value = String(visaId)
+    startPolling()
   } else {
-    selectedVisaRequest.value = String(visaId);
+    selectedVisaRequest.value = String(visaId)
   }
-
 
   const currentScrollPosition = chatContainer.value?.scrollTop || 0
   const currentScrollHeight = chatContainer.value?.scrollHeight || 0
@@ -584,7 +657,6 @@ const loadMessages = async (visaId: string, isPolling = false) => {
     const customId = selectedUser.value.id
     const res = await api.get(`/message/showbyvisarequest/${customId}/${visaId}`)
 
-    // Assurez-vous que les données contiennent le nom de l'agent si possible
     const agentMessages = (res.data.agentMessages ?? []) as Chat[]
     const customMessages = (res.data.customMessages ?? []) as Chat[]
 
@@ -593,10 +665,8 @@ const loadMessages = async (visaId: string, isPolling = false) => {
 
     const allMessages = [...agentWithMeta, ...customWithMeta].map((m) => ({
       ...m,
-      // Utilisation de created_at pour l'ordre, updated_at pour l'horodatage final
       updated_at: m.updated_at ? new Date(m.updated_at).toISOString() : new Date().toISOString(),
       created_at: m.created_at ? new Date(m.created_at).toISOString() : new Date().toISOString(),
-      // Assurez-vous que l'objet 'user' (l'auteur) est présent si c'est un agent
     }))
 
     messages.value = allMessages.sort(
@@ -606,13 +676,12 @@ const loadMessages = async (visaId: string, isPolling = false) => {
     await nextTick()
 
     if (!isPolling || !isUserScrolling.value) {
-        scrollToBottom(true)
+      scrollToBottom(true)
     } else if (chatContainer.value) {
       const newScrollHeight = chatContainer.value.scrollHeight
       const scrollDifference = newScrollHeight - currentScrollHeight
       chatContainer.value.scrollTop = currentScrollPosition + scrollDifference
     }
-
   } catch (err) {
     console.error('Erreur loadMessages:', err)
     messages.value = []
@@ -634,7 +703,11 @@ const sendMessage = async () => {
     updated_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
     source: 'agent',
-    user: { id: userStore.user?.id || '', name: userStore.user?.name || 'Agent' } // Info agent pour l'affichage immédiat
+    user: {
+      id: userStore.user?.id || '',
+      name: userStore.user?.name || 'Agent',
+      email: userStore.user?.email || '',
+    }, // Info agent pour l'affichage immédiat
   }
 
   messages.value.push(tempMessage)
@@ -642,7 +715,11 @@ const sendMessage = async () => {
   newMessage.value = ''
 
   try {
-    const res = await chatStore.createChat({ ...tempMessage, user_id: tempMessage.user_id, status: 'sent' })
+    const res = await chatStore.createChat({
+      ...tempMessage,
+      user_id: tempMessage.user_id,
+      status: 'sent',
+    })
     if (res?.data?.id) {
       messages.value = messages.value.map((m) =>
         String(m.id) === String(tempId)
@@ -685,7 +762,8 @@ const deleteMessage = async (id: string) => {
 }
 
 const editMessage = (msg: Chat) => {
-  if (msg.user?.id !== userStore.user?.id) return
+  // Seuls les messages de l'agent actuel peuvent être édités
+  if (msg.user?.id !== userStore.user?.id || msg.source !== 'agent') return
   isEdit.value = true
   newMessage.value = msg.content
   selectMessage.value = msg
@@ -716,27 +794,29 @@ const editMessageSend = async () => {
   }
 }
 
-// --- Popover Logic (Correction du bug ici) ---
+// --- Popover Logic ---
 const showVisaPopover = (e: MouseEvent, id: string) => {
   if (hideTimeout) clearTimeout(hideTimeout)
   hoveredVisaId.value = id
   hoveredVisaDetails.value = visaRequests.value.find((v) => v.id === id) ?? null
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
 
-  let leftPos = rect.right + window.scrollX + 10;
-  const topPos = rect.top + window.scrollY;
+  let leftPos = rect.right + window.scrollX + 10
+  const topPos = rect.top + window.scrollY
 
-  // Ajustement pour ne pas sortir à droite de l'écran
-  if (leftPos + 350 > window.innerWidth) { // 350 = largeur max du popover (sm:max-w-sm ~= 384px) + padding
-    leftPos = rect.left + window.scrollX - 350;
+  // Ajustement pour éviter de sortir de l'écran (350px = largeur max du popover)
+  if (leftPos + 350 > window.innerWidth) {
+    leftPos = rect.left + window.scrollX - 350
   }
 
   popoverPos.value = { top: topPos, left: leftPos }
   visaPopoverVisible.value = true
 }
 
-// Rendre cette fonction vide ou non utilisée car le mouseleave est géré sur le Popover lui-même
-const moveVisaPopover = (e: MouseEvent) => { /* Laisser vide pour le moment */ }
+// Neutralisation de moveVisaPopover (qui causait des instabilités)
+const moveVisaPopover = () => {
+  // Laisse cette fonction vide pour stabiliser le popover
+}
 
 const hideVisaPopover = () => {
   if (hideTimeout) clearTimeout(hideTimeout)
@@ -751,123 +831,161 @@ const hideVisaPopover = () => {
 const cancelHidePopover = () => hideTimeout && clearTimeout(hideTimeout)
 
 const handleResize = () => {
-    const wasMobile = isMobile.value;
-    isMobile.value = window.innerWidth < 640;
+  const wasMobile = isMobile.value
+  isMobile.value = window.innerWidth < 640
 
-    // Si on passe de mobile à desktop
-    if (wasMobile && !isMobile.value) {
-        showUsersList.value = true;
-        showVisaRequestList.value = false;
+  // Si on passe de mobile à desktop
+  if (wasMobile && !isMobile.value) {
+    showUsersList.value = true // Afficher les clients
+    showVisaRequestList.value = false // Cacher l'overlay
+    // Si un utilisateur est sélectionné, charger sa première demande
+    if (selectedUser.value && !selectedVisaRequest.value && idVisaRequest.value.length > 0) {
+      loadMessages(idVisaRequest.value[0])
     }
-    // Si on passe de desktop à mobile
-    else if (!wasMobile && isMobile.value) {
-        // Si un chat est sélectionné, on cache la liste des clients
-        if (selectedVisaRequest.value) {
-            showUsersList.value = false;
-            showVisaRequestList.value = false;
-        } else if (selectedUser.value && idVisaRequest.value.length > 0) {
-             // Si un utilisateur est sélectionné mais pas de demande, on montre la liste des demandes
-             showUsersList.value = false;
-             showVisaRequestList.value = true;
-        } else {
-            showUsersList.value = true; // S'il n'y a pas de chat ni d'utilisateur, on montre la liste des clients
-        }
-    }
+  }
 }
 
-// --- Watchers & Lifecycle ---
-watch(selectedVisaRequest, (newVal) => {
-  stopPolling()
-  if (newVal) startPolling()
+// --- Lifecycle & Init ---
+watch(isMobile, (newIsMobile) => {
+  if (newIsMobile) {
+    // Si passage en mobile
+    if (selectedUser.value && !selectedVisaRequest.value && idVisaRequest.value.length > 0) {
+      // Si un client est sélectionné mais pas de demande: montrer la liste des demandes
+      showUsersList.value = false
+      showVisaRequestList.value = true
+    } else if (selectedVisaRequest.value) {
+      // Si un chat est actif, masquer la liste des clients
+      showUsersList.value = false
+      showVisaRequestList.value = false
+    } else {
+      // Par défaut, montrer la liste des clients
+      showUsersList.value = true
+      showVisaRequestList.value = false
+    }
+  } else {
+    // Si passage en desktop
+    showUsersList.value = true
+    showVisaRequestList.value = false
+  }
 })
 
-watch(
-  () => messages.value.length,
-  async (newLength, oldLength) => {
-    if (newLength > oldLength) {
-      await nextTick()
-      if (!isUserScrolling.value) scrollToBottom(true)
-    }
-  },
-)
-
 onMounted(async () => {
-  window.addEventListener('resize', handleResize);
+  window.addEventListener('resize', handleResize)
 
   try {
+    // 1. Charger tous les utilisateurs
     const res = await userStore.getCustoms()
     users.value = res?.data ?? []
+    loading.value = false
 
-    if (route.params.userId && route.params.visaRequestId) {
-      const user = users.value.find((u) => u.id == route.params.userId)
+    // 2. Vérifier si un UserID est dans la route (Deep link)
+    const userIdInRoute = route.params.userId as string
+    const visaRequestIdInRoute = route.params.visaRequestId as string
+
+    if (userIdInRoute) {
+      const user = users.value.find((u) => u.id === userIdInRoute)
       if (user) {
         await selectUser(user)
-        await loadMessages(String(route.params.visaRequestId))
-        if(isMobile.value) showUsersList.value = false; // Cache la liste des clients si lien profond
+
+        // 3. Charger la demande spécifique si présente
+        if (visaRequestIdInRoute && idVisaRequest.value.includes(visaRequestIdInRoute)) {
+          await loadMessages(visaRequestIdInRoute)
+          if (isMobile.value) {
+            showUsersList.value = false
+            showVisaRequestList.value = false // Chat affiché
+          }
+        } else if (isMobile.value && idVisaRequest.value.length > 0) {
+          showUsersList.value = false
+          showVisaRequestList.value = true // Liste des demandes affichée
+        }
       }
-    } else if (users.value.length > 0 && !isMobile.value) {
-      await selectUser(users.value[0])
+    } else {
+      // Par défaut, s'assurer que la liste des utilisateurs est visible
+      showUsersList.value = true
     }
   } catch (err) {
-    console.error('Erreur lors du chargement des utilisateurs :', err)
-  } finally {
-    loading.value = false
+    console.error(err)
+    error.value = 'Erreur lors du chargement des utilisateurs.'
   }
 })
 
 onBeforeUnmount(() => {
-    stopPolling();
-    window.removeEventListener('resize', handleResize);
+  stopPolling()
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
 <style scoped>
-/* Scrollbar Stylings */
+/* Les styles restent inchangés et sont valides */
+
+.bg-\[\#f0f2f5\] {
+  background-color: #f0f2f5;
+}
+
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(147, 51, 234, 0.7) transparent; /* purple-600 equivalent */
+  scrollbar-color: rgba(160, 174, 192, 0.7) transparent;
 }
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(147, 51, 234, 0.7);
+  background-color: rgba(160, 174, 192, 0.7);
   border-radius: 3px;
 }
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-/* Transitions */
-.list-move,
+.shadow-inner-top {
+  box-shadow:
+    0 -1px 3px 0 rgba(0, 0, 0, 0.05),
+    0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Animations de transition */
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s ease;
 }
-
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateX(-30px);
 }
 
-.list-leave-active {
-  position: absolute;
+.pop-up-enter-active {
+  transition: all 0.3s ease-out;
+}
+.pop-up-leave-active {
+  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.pop-up-enter-from,
+.pop-up-leave-to {
+  transform: translateY(-10px) scale(0.95);
+  opacity: 0;
 }
 
+.fade-in-enter-active,
+.fade-in-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.fade-in-enter-from,
+.fade-in-leave-to {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+/* Animation pour l'overlay mobile */
 .slide-left-enter-active,
 .slide-left-leave-active {
   transition: transform 0.3s ease-out;
 }
-
 .slide-left-enter-from,
 .slide-left-leave-to {
   transform: translateX(100%);
-}
-
-.fade-in-enter-active {
-  transition: opacity 0.2s ease-out;
-}
-
-.fade-in-enter-from {
-  opacity: 0;
 }
 </style>

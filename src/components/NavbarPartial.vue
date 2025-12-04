@@ -63,7 +63,7 @@ const isName = computed(() =>
         <div v-if="!isName">
           <router-link
             :to="{ name: 'custom.dashboard' }"
-            class="ml-6 px-6 py-2 text-white lg:text-xl font-semibold bg-blue-600 rounded-full shadow-md hover:scale-105 hover:shadow-lg transition-all"
+            class="ml-6 px-6 py-2 text-white lg:text-xl font-semibold bg-blue-800 rounded-full shadow-md hover:scale-105 hover:shadow-lg transition-all"
           >
             {{ isConnect ? 'Tableau de bord' : 'Commencer le suivi' }}
           </router-link>

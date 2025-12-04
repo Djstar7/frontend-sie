@@ -176,7 +176,7 @@ const router = createRouter({
             { path: 'add', name: 'admin.visa.add', component: AddVisaAdmin },
             { path: 'add/:id', name: 'admin.visa.edit', component: AddVisaAdmin },
             { path: 'show/:id', name: 'admin.visa.show', component: ShowVisaAdmin },
-          ]
+          ],
         },
         {
           path: 'visarequest',

@@ -19,12 +19,10 @@ const idProfil = ref<string | undefined>(undefined)
 const isOpenModalEditUser = ref(false)
 const isOpenModalCreateUser = ref(false)
 
-
 const isOpenDelete = ref(false)
 const selectedId = ref<string | null>(null)
 
 const search = ref('')
-
 
 const route = useRoute()
 const initialRole = (route.query.role as string)?.toLowerCase()
@@ -32,7 +30,6 @@ const filterRole = ref<string>(initialRole || '')
 
 const userStore = useUserStore()
 const profilStore = useProfilStore()
-
 
 const currentPage = ref(1)
 const perPage = ref(20)
@@ -68,10 +65,8 @@ const fetchProfil = async (id: string) => {
 
 const addUser = () => (isOpenModalCreateUser.value = true)
 
-
 const editUser = (user: UserRegister, profil: Profil) => {
   isOpenModalEditUser.value = true
-
 
   const { id, ...profilWithoutId } = profil as { id?: string } & Omit<Profil, 'id'>
   userData.value = {
@@ -90,7 +85,6 @@ const handleUserUpdated = () => {
   fetchUsers()
   isOpenModalEditUser.value = false
 }
-
 
 const openDelete = (id: string) => {
   selectedId.value = id
@@ -111,7 +105,6 @@ const deleteUser = async (id: string | null) => {
   }
 }
 
-
 const filteredUsers = computed(() => {
   const term = search.value.toLowerCase()
 
@@ -130,14 +123,12 @@ const filteredUsers = computed(() => {
   })
 })
 
-
 const totalPages = computed(() => Math.ceil(filteredUsers.value.length / perPage.value))
 
 const paginatedUsers = computed(() => {
   const start = (currentPage.value - 1) * perPage.value
   return filteredUsers.value.slice(start, start + perPage.value)
 })
-
 
 watch(
   [search, filterRole, users],
@@ -375,7 +366,7 @@ onMounted(fetchUsers)
           </button>
           <EditUser
             :form="userData!"
-            :id="userData?.id"
+            :id="userData?.id!"
             :idProfil="idProfil!"
             @updated="handleUserUpdated"
           />

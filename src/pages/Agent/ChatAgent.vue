@@ -103,7 +103,7 @@
             }"
           >
             <div class="flex items-center justify-between">
-              <p class="truncate font-medium">Demande #{{ id.substring(0, 8) }}</p>
+              <p class="truncate font-medium">Demande</p>
               <i
                 v-if="selectedVisaRequest === id"
                 class="fas fa-comment-dots text-orange-500 ml-2"
@@ -170,7 +170,7 @@
                 v-if="selectedVisaRequest"
                 class="text-xs font-semibold text-orange-600 truncate leading-none mt-0.5"
               >
-                Demande #{{ selectedVisaRequest.substring(0, 8) }}
+                Demande
               </span>
               <span v-else class="text-xs font-medium text-gray-500 truncate leading-none mt-0.5">
                 Sélectionnez une demande

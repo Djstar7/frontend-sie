@@ -7,6 +7,7 @@ interface UserRegister {
   name: string
   email: string
   password?: string
+  image?: string
   role?: Role
 }
 interface UserLogin {
@@ -89,7 +90,6 @@ export type UserData = UserRegister & {
   numberMessageUnRead: number
   numberVisaRequestPending: number
 }
-
 
 export type {
   UserRegister,

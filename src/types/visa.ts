@@ -28,7 +28,7 @@ interface VisaFetch {
   price_per_child: number | null
   processing_duration_min: number | null
   processing_duration_max: number | null
-  status_mat: StatusMat
+  status_mat: StatusMat | Array<StatusMat>
   max_age: number
   min_age: number
   documents: string[]

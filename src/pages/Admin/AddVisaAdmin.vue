@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useCountryStore } from '@/stores/countryStore'
 import { useVisaTypeStore } from '@/stores/visaTypeStore'
-import {  useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { VisaFetch, VisaType } from '@/types/visa'
 import { vOnClickOutside } from '@vueuse/components'
 import { documentRequest } from '@/utils/dataAdmin'
@@ -29,7 +29,7 @@ const form = ref<VisaFetch>({
   price_per_child: null,
   processing_duration_min: null,
   processing_duration_max: null,
-  status_mat: 'single',
+  status_mat: ['single', 'divorced'],
   min_age: 18,
   max_age: 50,
   documents: [] as string[],
@@ -187,7 +187,10 @@ const submitForm = async () => {
     router.push({ name: 'admin.visa' })
     toastSuccess(res.message)
   } catch (e) {
-    console.error(`Erreur lors de ${isEditMode.value ? 'la modification' : 'la création'} du visa :`, e)
+    console.error(
+      `Erreur lors de ${isEditMode.value ? 'la modification' : 'la création'} du visa :`,
+      e,
+    )
   }
 }
 </script>
@@ -195,7 +198,11 @@ const submitForm = async () => {
 <template>
   <div class="w-full mx-auto px-6 py-10 bg-white rounded-2xl shadow-lg">
     <h2 class="text-3xl md:text-4xl font-bold text-orange-400 text-center mb-8">
-      {{ isEditMode ? 'Modifier la liste des documents' : 'Créer la liste des documents pour une demande' }}
+      {{
+        isEditMode
+          ? 'Modifier la liste des documents'
+          : 'Créer la liste des documents pour une demande'
+      }}
     </h2>
 
     <form @submit.prevent="submitForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -210,13 +217,31 @@ const submitForm = async () => {
           @focus="isCountryOpen = true"
           :placeholder="'Rechercher ou sélectionner un pays...'"
         />
-        <span class="absolute top-1/2 right-3 transform translate-y-1/2 pointer-events-none text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <span
+          class="absolute top-1/2 right-3 transform translate-y-1/2 pointer-events-none text-gray-400"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </span>
-        <ul v-if="isCountryOpen" class="absolute top-full left-0 right-0 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-0.5 z-50 shadow-md">
-          <li v-if="filteredCountries.length === 0" class="p-2 text-gray-400 text-xs">Aucun résultat</li>
+        <ul
+          v-if="isCountryOpen"
+          class="absolute top-full left-0 right-0 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-0.5 z-50 shadow-md"
+        >
+          <li v-if="filteredCountries.length === 0" class="p-2 text-gray-400 text-xs">
+            Aucun résultat
+          </li>
           <li
             v-for="country in filteredCountries"
             :key="country.id"
@@ -242,13 +267,31 @@ const submitForm = async () => {
           @focus="isVisaOpen = true"
           :placeholder="'Rechercher ou sélectionner un type de visa...'"
         />
-        <span class="absolute top-1/2 right-3 transform translate-y-1/2 pointer-events-none text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <span
+          class="absolute top-1/2 right-3 transform translate-y-1/2 pointer-events-none text-gray-400"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </span>
-        <ul v-if="isVisaOpen" class="absolute top-full left-0 right-0 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-0.5 z-50 shadow-md">
-          <li v-if="filteredVisaTypes.length === 0" class="p-2 text-gray-400 text-xs">Aucun résultat</li>
+        <ul
+          v-if="isVisaOpen"
+          class="absolute top-full left-0 right-0 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-0.5 z-50 shadow-md"
+        >
+          <li v-if="filteredVisaTypes.length === 0" class="p-2 text-gray-400 text-xs">
+            Aucun résultat
+          </li>
           <li
             v-for="type in filteredVisaTypes"
             :key="type.id"
@@ -397,7 +440,7 @@ const submitForm = async () => {
           </li>
         </transition-group>
         <p v-if="form.documents.length === 0" class="text-gray-400 italic mt-2 text-sm">
-            Veuillez ajouter les documents requis ci-dessus.
+          Veuillez ajouter les documents requis ci-dessus.
         </p>
       </div>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="flex md:h-[87vh] overflow-hidden bg-gray-100 antialiased text-sm">
     <aside
-      class="flex-shrink-0 flex-col w-full xs:w-72 sm:w-64 md:w-20 lg:w-80 xl:w-96 border-r border-gray-200 bg-white shadow-xl shadow-gray-200/50 transition-all duration-300 absolute md:relative z-40 h-full"
+      class="flex-shrink-0 flex-col w-full xs:w-72 sm:w-64 md:w-10 lg:w-40 xl:w-60 border-r border-gray-200 bg-white shadow-xl shadow-gray-200/50 transition-all duration-300 absolute md:relative z-40 h-full"
       :class="{
         flex: showList,
         'hidden md:flex': !showList,
@@ -38,14 +38,14 @@
             }"
           >
             <div
-              class="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 lg:w-10 lg:h-10 rounded-full flex items-center justify-center font-bold text-white text-xs sm:text-sm mr-3 md:mr-0 lg:mr-4"
+              class="flex-shrink-0 w-8 h-8 md:w-8 md:h-10 lg:w-10 lg:h-10 rounded-full flex items-center justify-center font-bold text-white text-xs sm:text-sm mr-3 md:mr-0 lg:mr-4"
               :class="selectedVisaRequest === id ? 'bg-blue-500' : 'bg-gray-400'"
             >
               #
             </div>
 
             <div class="flex-1 min-w-0 md:hidden lg:block">
-              <p class="font-medium text-gray-800 truncate text-sm">Demande #{{ id }}</p>
+              <p class="font-medium text-gray-800 truncate text-sm">Demande</p>
               <p class="text-xs text-gray-500 truncate mt-0.5">Cliquez pour ouvrir le chat</p>
             </div>
 
@@ -109,14 +109,14 @@
               <i class="fas fa-arrow-left text-lg sm:text-xl"></i>
             </button>
             <h3 class="text-base sm:text-lg font-medium text-gray-800 truncate md:hidden">
-              Chat Demande #{{ selectedVisaRequest }}
+              Chat Demande
             </h3>
             <span
               class="hidden md:flex items-center text-lg font-medium text-gray-800 truncate"
               title="Demande de Visa"
             >
               <i class="fas fa-file-alt text-blue-500 mr-2"></i>
-              Demande #{{ selectedVisaRequest }}
+              Demande
             </span>
             <span
               class="ml-3 text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full hidden sm:inline-block flex-shrink-0"
@@ -142,7 +142,7 @@
           @scroll="onScroll"
         >
           <div
-            class="p-4 space-y-3 sm:space-y-4 max-w-full mx-auto md:max-w-3xl lg:max-w-4xl xl:max-w-5xl"
+            class="space-y-3 mx-auto sm:space-y-4 max-w-full md:max-w-4xl lg:max-w-6xl xl:max-w-7xl"
           >
             <div v-if="messages.length === 0" class="flex justify-center pt-4 sm:pt-8">
               <div
@@ -164,14 +164,14 @@
                   v-if="msg?.source == 'custom'"
                   class="absolute z-20 transition-all duration-200 right-0 top-0"
                   :class="{
-                    'mt-0 -mr-2': msg?.content.length <= 50,
+                    '-mt-4 -mr-2': msg?.content.length <= 50,
                     '-mt-8': msg?.content.length > 50,
                     'opacity-100 md:opacity-0 md:group-hover:opacity-100':
                       highlightedMessageId !== msg.id,
                   }"
                 >
                   <div
-                    class="bg-gray-800/90 backdrop-blur-sm p-1 rounded-md text-white flex space-x-1 shadow-lg shadow-gray-900/10"
+                    class="bg-gray-800/90 backdrop-blur-sm p-1 rounded-md text-white flex space-x-0.5 shadow-lg shadow-gray-900/10"
                   >
                     <button
                       @click.stop="editMessage(msg)"
@@ -264,7 +264,7 @@
             :rows="Math.min(5, Math.max(1, newMessage.split('\n').length))"
             type="text"
             placeholder="Écrivez un message ici..."
-            class="flex-1 resize-none border-0 bg-white rounded-xl px-4 py-2.5 shadow-inner-sm focus:ring-2 focus:ring-blue-400/50 focus:border-blue-500 focus:outline-none transition duration-150 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white text-sm sm:text-base"
+            class="flex-1 sm:fixed sm:top-[20px] resize-none border-0 bg-white rounded-xl px-4 py-2.5 shadow-inner-sm focus:ring-2 focus:ring-blue-400/50 focus:border-blue-500 focus:outline-none transition duration-150 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white text-sm sm:text-base"
             @keyup.enter.prevent="isEdit ? editMessageSend() : sendMessage()"
             :disabled="!selectedVisaRequest"
           ></textarea>
@@ -290,7 +290,7 @@
       >
         <h3 class="font-bold text-gray-800 mb-2 border-b pb-1 border-gray-100 text-sm sm:text-base">
           <i class="fas fa-tag mr-1 text-blue-500"></i>
-          Détails Demande #{{ hoveredVisaDetails.id }}
+          Détails Demande
         </h3>
         <div class="space-y-1 text-gray-700">
           <div v-if="hoveredVisaDetails.status">
@@ -313,6 +313,10 @@
           <div v-if="(hoveredVisaDetails as any).visa_type_name">
             <span class="font-semibold">Type:</span>
             {{ (hoveredVisaDetails as any).visa_type_name }}
+          </div>
+          <div v-if="(hoveredVisaDetails as any).country_dest_name">
+            <span class="font-semibold">Pays:</span>
+            {{ (hoveredVisaDetails as any).country_dest_name }}
           </div>
           <router-link
             class="text-blue-600 hover:text-blue-700 font-medium transition duration-150 block mt-2 text-xs sm:text-sm"

@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useNotificationStore } from '@/stores/notificationStore'
 import type { Notification } from '@/types/notification'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 
 // --- Props et Événements ---
 const props = defineProps<{ isOpen: boolean }>()
@@ -11,21 +12,31 @@ const emit = defineEmits(['close'])
 // --- Stock et état ---
 const router = useRouter()
 const notificationStore = useNotificationStore()
+const userStore = useUserStore()
 const notifications = ref<Notification[]>([])
 const selectedNotif = ref<Notification | null>(null)
 const showModal = ref(false)
 const filter = ref<'all' | 'unread' | 'read'>('all')
+const isLoggedIn = computed(() => !!userStore.user)
 
 // --- Initialisation ---
 onMounted(async () => {
   try {
+    if (!isLoggedIn.value) return
     const res = await notificationStore.getNotification()
     notifications.value = res?.data || []
-    console.log(res?.data)
   } catch (error) {
     console.error('Erreur de chargement des notifications:', error)
   }
 })
+setInterval(async () => {
+  try {
+    const res = await notificationStore.getNotification()
+    notifications.value = res?.data || []
+  } catch (error) {
+    console.error('Erreur de chargement des notifications:', error)
+  }
+}, 5000)
 
 // --- Fonctions utilitaires ---
 const formatType = (type: string) => {
@@ -227,7 +238,7 @@ const markAllRead = async () => {
           <div class="flex-1 min-w-0">
             <div class="flex justify-between items-center">
               <p class="font-bold text-gray-900 line-clamp-1">
-                {{ formatType(notif.type) }}
+                {{ notif.author ? formatType(notif.author) : formatType(notif.type) }}
               </p>
               <div
                 v-if="!notif.status"

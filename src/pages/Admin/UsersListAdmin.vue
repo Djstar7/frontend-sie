@@ -8,6 +8,7 @@ import { toastSuccess } from '@/utils/toastConfig'
 import EditUser from '@/components/EditUser.vue'
 import CreateUser from '@/components/CreateUser.vue'
 import DeleteModal from '@/components/DeleteModal.vue'
+import { statusMap } from '@/utils/dataMap'
 
 const users = ref<UserRegister[]>([])
 const profils = ref<Record<string, Profil | null>>({})
@@ -171,7 +172,7 @@ const convertToCSV = (data: any[]) => {
       const email = sanitize(user.email)
       const phone = sanitize(profil?.phone)
       const role = sanitize(user.role)
-      const statusMat = sanitize(profil?.status_mat)
+      const statusMat = sanitize(statusMap.get(profil?.status_mat!))
       const nationality = sanitize(profil?.nationality)
 
       // Utilisez le point-virgule (;) comme séparateur pour éviter les conflits avec les virgules dans les données
@@ -352,7 +353,7 @@ const exportToCSV = () => {
             </td>
 
             <td class="px-4 py-3 text-sm text-gray-700 capitalize">
-              {{ profils[user.id!]?.status_mat || 'N/A' }}
+              {{ statusMap.get(profils[user.id!]?.status_mat!) || 'N/A' }}
             </td>
 
             <td class="px-4 py-3 text-sm text-gray-700 capitalize">

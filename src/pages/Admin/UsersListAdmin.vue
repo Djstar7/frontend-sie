@@ -139,6 +139,74 @@ watch(
 )
 
 onMounted(fetchUsers)
+
+// --- FONCTIONNALITÉ D'EXPORTATION CSV ---
+
+// Fonction utilitaire pour convertir un tableau d'objets en chaîne CSV
+const convertToCSV = (data: any[]) => {
+  const headers = [
+    'Nom complet',
+    "Nom d'utilisateur",
+    'Email',
+    'Téléphone',
+    'Rôle',
+    'Statut Mat.',
+    'Pays',
+  ]
+  const headerRow = headers.join(';') + '\n'
+
+  const csvContent = data
+    .map((user) => {
+      const profil = profils.value[user.id ?? '']
+
+      // Encodage des chaînes pour éviter les problèmes avec les virgules/accents dans les données
+      const sanitize = (str: string | undefined | null) => {
+        if (!str) return 'N/A'
+        // Assurez-vous que l'encodage est UTF-8 pour les accents
+        return `"${String(str).replace(/"/g, '""')}"`
+      }
+
+      const fullName = sanitize(`${profil?.first_name || 'N/A'} ${profil?.last_name || 'N/A'}`)
+      const name = sanitize(user.name)
+      const email = sanitize(user.email)
+      const phone = sanitize(profil?.phone)
+      const role = sanitize(user.role)
+      const statusMat = sanitize(profil?.status_mat)
+      const nationality = sanitize(profil?.nationality)
+
+      // Utilisez le point-virgule (;) comme séparateur pour éviter les conflits avec les virgules dans les données
+      return [fullName, name, email, phone, role, statusMat, nationality].join(';')
+    })
+    .join('\n')
+
+  return headerRow + csvContent
+}
+
+// Fonction pour déclencher le téléchargement du fichier CSV
+const exportToCSV = () => {
+  if (filteredUsers.value.length === 0) {
+    alert('Aucune donnée à exporter.')
+    return
+  }
+
+  // Nous exportons les utilisateurs filtrés (tous les utilisateurs si aucun filtre)
+  const csv = convertToCSV(filteredUsers.value)
+
+  const blob = new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8;' }) // Ajout de \ufeff pour le BOM UTF-8
+
+  const link = document.createElement('a')
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'utilisateurs.csv')
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+}
+
+// --- FIN FONCTIONNALITÉ D'EXPORTATION CSV ---
 </script>
 <template>
   <div class="p-4 sm:p-6 w-full bg-gray-50 min-h-screen">
@@ -172,13 +240,24 @@ onMounted(fetchUsers)
         </select>
       </div>
 
-      <button
-        @click="addUser"
-        class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition duration-150 cursor-pointer w-full md:w-auto justify-center"
-      >
-        <i class="fas fa-user-plus"></i>
-        Ajouter un utilisateur
-      </button>
+      <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+        <button
+          @click="exportToCSV"
+          :disabled="isLoading || filteredUsers.length === 0"
+          class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition duration-150 cursor-pointer w-full md:w-auto justify-center disabled:opacity-50"
+        >
+          <i class="fas fa-file-csv"></i>
+          Exporter en CSV
+        </button>
+
+        <button
+          @click="addUser"
+          class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition duration-150 cursor-pointer w-full md:w-auto justify-center"
+        >
+          <i class="fas fa-user-plus"></i>
+          Ajouter un utilisateur
+        </button>
+      </div>
     </div>
 
     <div

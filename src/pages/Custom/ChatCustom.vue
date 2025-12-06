@@ -264,7 +264,7 @@
             :rows="Math.min(5, Math.max(1, newMessage.split('\n').length))"
             type="text"
             placeholder="Écrivez un message ici..."
-            class="flex-1 sm:fixed sm:top-[20px] resize-none border-0 bg-white rounded-xl px-4 py-2.5 shadow-inner-sm focus:ring-2 focus:ring-blue-400/50 focus:border-blue-500 focus:outline-none transition duration-150 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white text-sm sm:text-base"
+            class="flex-1 resize-none border-0 bg-white rounded-xl px-4 py-2.5 shadow-inner-sm focus:ring-2 focus:ring-blue-400/50 focus:border-blue-500 focus:outline-none transition duration-150 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-white text-sm sm:text-base"
             @keyup.enter.prevent="isEdit ? editMessageSend() : sendMessage()"
             :disabled="!selectedVisaRequest"
           ></textarea>

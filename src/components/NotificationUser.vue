@@ -23,6 +23,7 @@ const isLoggedIn = computed(() => !!userStore.user)
 onMounted(async () => {
   try {
     if (!isLoggedIn.value) return
+    console.log('Erreur')
     const res = await notificationStore.getNotification()
     notifications.value = res?.data || []
   } catch (error) {

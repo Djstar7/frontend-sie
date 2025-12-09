@@ -12,7 +12,7 @@ export function useAvisStore() {
       const response = await avisService.getAvis()
       return response
     } catch (err) {
-      loading.handleError(err, 'Échec du chargement')
+      // loading.handleError(err, 'Échec du chargement')
     } finally {
       loading.stopLoading()
     }

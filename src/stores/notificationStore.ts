@@ -10,7 +10,7 @@ export function useNotificationStore() {
     try {
       return await notificationService.getNotifications()
     } catch (err) {
-      loading.handleError(err, 'Impossible de récupérer les notifications')
+      // loading.handleError(err, 'Impossible de récupérer les notifications')
     } finally {
       loading.stopLoading()
     }

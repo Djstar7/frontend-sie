@@ -47,7 +47,7 @@ const fetchAppointments = async () => {
 }
 
 const addAppointment = async () => {
-  if (!newAppointment.value.scheduled_at) return toastError('La date et l\'heure sont requises.')
+  if (!newAppointment.value.scheduled_at) return toastError("La date et l'heure sont requises.")
 
   const selectedDate = new Date(newAppointment.value.scheduled_at)
   if (selectedDate <= new Date())
@@ -66,7 +66,7 @@ const addAppointment = async () => {
     toastSuccess('Rendez-vous proposé avec succès.')
   } catch (e) {
     console.error(e)
-    toastError('Erreur lors de l\'ajout du rendez-vous.')
+    toastError("Erreur lors de l'ajout du rendez-vous.")
   } finally {
     saving.value = false
   }
@@ -181,7 +181,9 @@ onMounted(async () => {
       class="w-full max-w-6xl space-y-8 bg-white p-8 md:p-10 rounded-xl shadow-2xl border border-gray-100"
     >
       <header class="text-center pb-6 border-b border-gray-100">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 flex items-center justify-center gap-3">
+        <h1
+          class="text-3xl md:text-4xl font-extrabold text-gray-800 flex items-center justify-center gap-3"
+        >
           <i class="fas fa-passport text-purple-600"></i>
           Détails de la Demande
         </h1>
@@ -193,9 +195,7 @@ onMounted(async () => {
       </header>
 
       <div class="grid lg:grid-cols-3 gap-8">
-
         <div class="lg:col-span-1 space-y-6">
-
           <section class="bg-purple-50 border border-purple-200 rounded-xl p-5 shadow-lg">
             <h2 class="text-lg font-bold text-purple-700 mb-3 flex items-center gap-2">
               <i class="fas fa-info-circle"></i> Statut de la Demande
@@ -213,11 +213,14 @@ onMounted(async () => {
                 v-if="visaRequest.status === 'pending' && userStore.role === 'custom'"
                 class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded-lg font-medium text-sm text-center"
               >
-                <i class="fas fa-exclamation-circle mr-1"></i> Vous devez payer avant que notre service agent puisse trater votre demande !
+                <i class="fas fa-exclamation-circle mr-1"></i> Vous devez payer avant que notre
+                service agent puisse trater votre demande !
               </div>
 
               <div v-if="userStore.user?.role === 'agent' && visaRequest.status !== 'approved'">
-                <label for="status-update" class="block text-sm font-medium text-gray-700 mb-1">Mettre à jour le statut :</label>
+                <label for="status-update" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Mettre à jour le statut :</label
+                >
                 <select
                   id="status-update"
                   v-model="visaRequest.status"
@@ -235,9 +238,12 @@ onMounted(async () => {
 
           <div class="space-y-4 pt-2">
             <router-link
-             v-if="userStore.role !== 'admin'"
+              v-if="userStore.role !== 'admin'"
               :to="{
-                name: userStore.role === 'agent' ? 'agent.users.show.visarequest.show.document' : 'custom.visarequest.show.document',
+                name:
+                  userStore.role === 'agent'
+                    ? 'agent.users.show.visarequest.show.document'
+                    : 'custom.visarequest.show.document',
                 params: { visaRequestId: visaRequest.id },
                 query: { status: visaRequest.status },
               }"
@@ -247,9 +253,12 @@ onMounted(async () => {
             </router-link>
 
             <router-link
-             v-if="userStore.role !== 'admin' && visaRequest.status !== 'pending'"
+              v-if="userStore.role !== 'admin' && visaRequest.status !== 'pending'"
               :to="{
-                name: userStore.role === 'agent' ? 'agent.chat.user.show.visarequest.show' : 'custom.chat',
+                name:
+                  userStore.role === 'agent'
+                    ? 'agent.chat.user.show.visarequest.show'
+                    : 'custom.chat',
                 params: { visaRequestId: visaRequest.id, userId: visaRequest.user.id },
               }"
               class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2"
@@ -276,62 +285,87 @@ onMounted(async () => {
         </div>
 
         <div class="lg:col-span-2 space-y-8">
-
           <section class="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <h2 class="text-xl font-bold text-purple-600 mb-4 flex items-center gap-2 border-b-2 border-purple-100 pb-2">
+            <h2
+              class="text-xl font-bold text-purple-600 mb-4 flex items-center gap-2 border-b-2 border-purple-100 pb-2"
+            >
               <i class="fas fa-passport"></i> Informations Visa
             </h2>
 
             <div class="grid md:grid-cols-2 gap-4">
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3"
+              >
                 <i class="fas fa-tag text-purple-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Type de visa</p>
-                  <p class="font-semibold text-gray-800">{{ visaRequest.visa_type_name || 'N/A' }}</p>
+                  <p class="font-semibold text-gray-800">
+                    {{ visaRequest.visa_type_name || 'N/A' }}
+                  </p>
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3"
+              >
                 <i class="fas fa-align-left text-purple-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Description</p>
-                  <p class="font-semibold text-gray-800">{{ visaRequest.visa_type_desc || '—' }}</p>
+                  <p class="font-semibold text-gray-800 text-justify">
+                    {{ visaRequest.visa_type_desc || '—' }}
+                  </p>
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3"
+              >
                 <i class="fas fa-map-marker-alt text-purple-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Pays d’origine</p>
-                  <p class="font-semibold text-gray-800">{{ visaRequest.country_origin_name || 'N/A' }}</p>
+                  <p class="font-semibold text-gray-800">
+                    {{ visaRequest.country_origin_name || 'N/A' }}
+                  </p>
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-purple-500 flex items-start gap-3"
+              >
                 <i class="fas fa-plane-departure text-purple-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Destination</p>
-                  <p class="font-semibold text-gray-800">{{ visaRequest.country_dest_name || 'N/A' }}</p>
+                  <p class="font-semibold text-gray-800">
+                    {{ visaRequest.country_dest_name || 'N/A' }}
+                  </p>
                 </div>
               </div>
             </div>
           </section>
 
           <section class="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-            <h2 class="text-xl font-bold text-orange-600 mb-4 flex items-center gap-2 border-b-2 border-orange-100 pb-2">
+            <h2
+              class="text-xl font-bold text-orange-600 mb-4 flex items-center gap-2 border-b-2 border-orange-100 pb-2"
+            >
               <i class="fas fa-id-card"></i> Informations Client
             </h2>
 
             <div class="grid md:grid-cols-2 gap-4">
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3"
+              >
                 <i class="fas fa-user text-orange-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Nom complet</p>
-                  <p class="font-semibold text-gray-800">{{ visaRequest.profil.first_name }} {{ visaRequest.profil.last_name }}</p>
+                  <p class="font-semibold text-gray-800">
+                    {{ visaRequest.profil.first_name }} {{ visaRequest.profil.last_name }}
+                  </p>
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3"
+              >
                 <i class="fas fa-envelope text-orange-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Email</p>
@@ -339,7 +373,9 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3"
+              >
                 <i class="fas fa-phone text-orange-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Téléphone</p>
@@ -347,15 +383,21 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3"
+              >
                 <i class="fas fa-heart text-orange-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Statut matrimonial</p>
-                  <p class="font-semibold text-gray-800">{{ statusMap.get(visaRequest.profil.status_mat) }}</p>
+                  <p class="font-semibold text-gray-800">
+                    {{ statusMap.get(visaRequest.profil.status_mat) }}
+                  </p>
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3">
+              <div
+                class="p-4 bg-gray-50 rounded-lg border-l-4 border-orange-500 flex items-start gap-3"
+              >
                 <i class="fas fa-birthday-cake text-orange-600 mt-1"></i>
                 <div>
                   <p class="text-sm text-gray-500">Âge</p>
@@ -377,7 +419,9 @@ onMounted(async () => {
             class="bg-white rounded-xl p-6 shadow-md border border-gray-200"
             v-if="visaRequest.status === 'approved'"
           >
-            <h2 class="text-xl font-bold text-green-600 mb-4 flex items-center gap-2 border-b-2 border-green-100 pb-2">
+            <h2
+              class="text-xl font-bold text-green-600 mb-4 flex items-center gap-2 border-b-2 border-green-100 pb-2"
+            >
               <i class="fas fa-calendar-alt"></i> Gestion des Rendez-vous
             </h2>
 
@@ -413,7 +457,11 @@ onMounted(async () => {
                     <option value="pending">En attente</option>
                     <option value="rescheduled">Confirmer</option>
                   </select>
-                  <span v-else-if="userStore.user?.role === 'custom' && a.status === 'rescheduled'" class="text-green-600 font-semibold text-sm">Confirmé</span>
+                  <span
+                    v-else-if="userStore.user?.role === 'custom' && a.status === 'rescheduled'"
+                    class="text-green-600 font-semibold text-sm"
+                    >Confirmé</span
+                  >
 
                   <button
                     v-if="userStore.user?.role === 'agent'"
@@ -432,7 +480,10 @@ onMounted(async () => {
               Aucun rendez-vous proposé pour le moment.
             </p>
 
-            <div v-if="userStore.user?.role === 'agent'" class="mt-6 p-5 bg-gray-100 rounded-xl border border-gray-200">
+            <div
+              v-if="userStore.user?.role === 'agent'"
+              class="mt-6 p-5 bg-gray-100 rounded-xl border border-gray-200"
+            >
               <h3 class="font-bold text-gray-700 mb-3">Proposer un nouveau créneau :</h3>
               <input
                 v-model="newAppointment.scheduled_at"

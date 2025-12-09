@@ -1,6 +1,6 @@
 interface Backup {
   visa_request_id: string
-  file_path: string
+  backup_file: string
 }
 
 export type { Backup }

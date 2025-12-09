@@ -89,6 +89,7 @@ const router = createRouter({
             { path: '', name: 'custom.payment', component: PaymentCustom },
             { path: 'success', name: 'custom.payment.success', component: PaymentSuccess },
             { path: 'failed', name: 'custom.payment.failed', component: PaymentFailed },
+            { path: 'receipt', name: 'custom.payment.reciept', component: ReceiptVisaRequest },
             {
               path: 'store/:visaRequestId?',
               name: 'custom.payment.store',

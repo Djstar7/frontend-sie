@@ -14,7 +14,7 @@ onMounted(async () => {
   try {
     console.log('Récupération du reçu pour la demande ID :', visaRequestId)
     const response = await visaRequestStore.showVisaRequest(visaRequestId)
-    receipt.value = response?.data || null
+    receipt.value = (response?.data as unknown as Receipt) || null
     loading.value = false
     console.log('Reçu chargé :', receipt.value)
   } catch (error) {

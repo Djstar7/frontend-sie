@@ -27,7 +27,8 @@ export const useVisaStore = () => {
   const createVisa = async (visaData: VisaFetch) => {
     loading.startLoading('Creation de la demande en cours...')
     try {
-      return await visaService.createVisa(visaData)
+      const response = await visaService.createVisa(visaData)
+      return response
     } catch (err) {
       loading.handleError(err, 'Échec lors de la création du visa')
       throw err

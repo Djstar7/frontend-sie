@@ -25,7 +25,7 @@ export function validateForm<T extends object>(
         }
       } else {
         // Check for Validator function format
-        const validator = rule as Validator<T[K]>
+        const validator = rule as Validator<T[keyof T]>
         errorMessage = validator(value)
       }
 

@@ -206,9 +206,9 @@ export const allDocument = {
       validation: { required: true, fileTypes: ['pdf'], maxSizeMB: 2 },
     },
     {
-      name: 'Lettre explicative (ex: changement de passeport)',
+      name: 'Lettre explicative',
       guide: 'Lettre justifiant une situation particulière.',
       validation: { required: true, fileTypes: ['pdf'], maxSizeMB: 2 },
     },
   ],
-} as const
+}

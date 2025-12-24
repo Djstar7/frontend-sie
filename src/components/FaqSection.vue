@@ -1,28 +1,28 @@
 <template>
-  <section class="py-24 bg-white">
-    <div class="container mx-auto px-4 sm:px-6">
-      <div class="text-center mb-16">
-        <span class="text-sm font-semibold uppercase text-orange-600 tracking-wider"
+  <section class="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+    <div class="container mx-auto px-3 sm:px-4 md:px-6">
+      <div class="text-center mb-8 sm:mb-12 md:mb-16">
+        <span class="text-xs sm:text-sm font-semibold uppercase text-orange-600 tracking-wider"
           >Questions & Réponses</span
         >
-        <h2 class="text-3xl sm:text-5xl font-extrabold text-blue-900 mb-4 mt-2">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 sm:mb-4 mt-2">
           Foire aux Questions
         </h2>
-        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+        <p class="text-sm sm:text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-2">
           Les questions les plus fréquentes sur nos services de visa, clarifiées pour vous.
         </p>
       </div>
 
-      <div class="max-w-4xl mx-auto space-y-4">
+      <div class="max-w-4xl mx-auto space-y-3 sm:space-y-4">
         <div
-          class="bg-gray-50 rounded-xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 group"
+          class="bg-gray-50 rounded-lg sm:rounded-xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 group"
         >
           <div
-            class="flex justify-between items-center cursor-pointer p-5 sm:p-6 bg-white hover:bg-blue-50/50"
+            class="flex justify-between items-center cursor-pointer p-4 sm:p-5 md:p-6 bg-white hover:bg-blue-50/50"
             @click="toggleFaq(0)"
           >
             <h3
-              class="text-lg sm:text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors"
+              class="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors pr-2"
             >
               Quels documents sont nécessaires pour une demande de visa ?
             </h3>

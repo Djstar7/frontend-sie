@@ -1,235 +1,250 @@
 <template>
-  <div class="p-4 md:p-6 bg-gray-50 min-h-screen w-full">
-    <div class="mb-8">
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Tableau de bord administratif</h1>
-      <p class="text-gray-600 mt-2">
+  <div class="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen w-full">
+    <div class="mb-4 sm:mb-6 md:mb-8">
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">Tableau de bord administratif</h1>
+      <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
         Vue d'ensemble complète de la plateforme et de ses indicateurs clés.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-10">
       <div
-        class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform transition duration-300"
+        class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-4 sm:p-5 md:p-6 text-white transform transition duration-300"
       >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-blue-100 font-semibold">Total utilisateurs</p>
-            <h3 class="text-4xl font-extrabold">{{ totalUsers }}</h3>
+            <p class="text-blue-100 font-semibold text-xs sm:text-sm">Total utilisateurs</p>
+            <h3 class="text-2xl sm:text-3xl md:text-4xl font-extrabold">{{ totalUsers }}</h3>
           </div>
-          <i class="fas fa-users text-4xl text-blue-200 opacity-70"></i>
+          <i class="fas fa-users text-2xl sm:text-3xl md:text-4xl text-blue-200 opacity-70"></i>
         </div>
       </div>
 
       <div
-        class="bg-gradient-to-r from-orange-400 to-orange-500 rounded-xl shadow-lg p-6 text-white transform transition duration-300"
+        class="bg-gradient-to-r from-orange-400 to-orange-500 rounded-xl shadow-lg p-4 sm:p-5 md:p-6 text-white transform transition duration-300"
       >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-orange-100 font-semibold">Demandes de visa</p>
-            <h3 class="text-4xl font-extrabold">{{ totalVisaRequests }}</h3>
+            <p class="text-orange-100 font-semibold text-xs sm:text-sm">Demandes de visa</p>
+            <h3 class="text-2xl sm:text-3xl md:text-4xl font-extrabold">{{ totalVisaRequests }}</h3>
           </div>
-          <i class="fas fa-passport text-4xl text-orange-200 opacity-70"></i>
+          <i class="fas fa-passport text-2xl sm:text-3xl md:text-4xl text-orange-200 opacity-70"></i>
         </div>
       </div>
 
       <div
-        class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform transition duration-300"
+        class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-4 sm:p-5 md:p-6 text-white transform transition duration-300"
       >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-green-100 font-semibold">Paiements recus</p>
-            <h3 class="text-4xl font-extrabold">{{ totalPayments }}</h3>
+            <p class="text-green-100 font-semibold text-xs sm:text-sm">Paiements reçus</p>
+            <h3 class="text-2xl sm:text-3xl md:text-4xl font-extrabold">{{ totalPayments }}</h3>
           </div>
-          <i class="fas fa-check-circle text-4xl text-green-200 opacity-70"></i>
+          <i class="fas fa-check-circle text-2xl sm:text-3xl md:text-4xl text-green-200 opacity-70"></i>
         </div>
       </div>
 
       <div
-        class="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl shadow-lg p-6 text-white transform transition duration-300"
+        class="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl shadow-lg p-4 sm:p-5 md:p-6 text-white transform transition duration-300"
       >
         <div class="flex items-center justify-between">
-          <div>
-            <p class="text-purple-100 font-semibold">Revenus totaux</p>
-            <h3 class="text-3xl font-extrabold">{{ totalRevenue.toLocaleString('fr-CM') }} XAF</h3>
+          <div class="min-w-0">
+            <p class="text-purple-100 font-semibold text-xs sm:text-sm">Revenus totaux</p>
+            <h3 class="text-xl sm:text-2xl md:text-3xl font-extrabold truncate">{{ totalRevenue.toLocaleString('fr-CM') }} XAF</h3>
           </div>
-          <i class="fas fa-sack-dollar text-4xl text-purple-200 opacity-70"></i>
+          <i class="fas fa-sack-dollar text-2xl sm:text-3xl md:text-4xl text-purple-200 opacity-70 flex-shrink-0"></i>
         </div>
       </div>
     </div>
 
-    <hr class="mb-8 border-gray-200" />
+    <hr class="mb-4 sm:mb-6 md:mb-8 border-gray-200" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-      <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Statut des paiements</h2>
-        <div class="h-80 flex items-center justify-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-10">
+      <div class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Statut des paiements</h2>
+        <div class="h-60 sm:h-72 md:h-80 flex items-center justify-center">
           <canvas ref="statusPolarChartRef"></canvas>
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Répartition des utilisateurs</h2>
-        <div class="h-80 flex items-center justify-center">
+      <div class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Répartition des utilisateurs</h2>
+        <div class="h-60 sm:h-72 md:h-80 flex items-center justify-center">
           <canvas ref="userHorizontalBarRef"></canvas>
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Statistiques Clés</h2>
-        <div class="space-y-3">
+      <div class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300 md:col-span-2 lg:col-span-1">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Statistiques Clés</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
           <router-link
             :to="{ name: 'admin.payment', query: { status: 'completed' } }"
-            class="block p-4 bg-green-50 rounded-lg border-l-4 border-green-500 hover:shadow-md transition duration-300 cursor-pointer"
+            class="block p-3 sm:p-4 bg-green-50 rounded-lg border-l-4 border-green-500 hover:shadow-md transition duration-300 cursor-pointer"
           >
-            <p class="text-green-700 font-medium">Taux de réussite des paiements</p>
-            <p class="text-2xl font-bold text-green-800">{{ paymentSuccessRate }}%</p>
+            <p class="text-green-700 font-medium text-xs sm:text-sm">Taux de réussite des paiements</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-green-800">{{ paymentSuccessRate }}%</p>
           </router-link>
 
           <router-link
             :to="{ name: 'admin.visarequest', query: { period: 'this_month' } }"
-            class="block p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500 hover:shadow-md transition duration-300 cursor-pointer"
+            class="block p-3 sm:p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500 hover:shadow-md transition duration-300 cursor-pointer"
           >
-            <p class="text-blue-700 font-medium">Demandes ce mois-ci</p>
-            <p class="text-2xl font-bold text-blue-800">{{ requestsThisMonth }}</p>
+            <p class="text-blue-700 font-medium text-xs sm:text-sm">Demandes ce mois-ci</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-blue-800">{{ requestsThisMonth }}</p>
           </router-link>
 
           <router-link
             :to="{ name: 'admin.visatype' }"
-            class="block p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500 hover:shadow-md transition duration-300 cursor-pointer"
+            class="block p-3 sm:p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500 hover:shadow-md transition duration-300 cursor-pointer"
           >
-            <p class="text-purple-700 font-medium">Types de visa gérés</p>
-            <p class="text-2xl font-bold text-purple-800">{{ visaTypes.length }}</p>
+            <p class="text-purple-700 font-medium text-xs sm:text-sm">Types de visa gérés</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-purple-800">{{ visaTypes.length }}</p>
           </router-link>
 
           <router-link
             :to="{ name: 'admin.payment', query: { status: 'failed' } }"
-            class="block p-4 bg-red-50 rounded-lg border-l-4 border-red-500 hover:shadow-md transition duration-300 cursor-pointer"
+            class="block p-3 sm:p-4 bg-red-50 rounded-lg border-l-4 border-red-500 hover:shadow-md transition duration-300 cursor-pointer"
           >
-            <p class="text-red-700 font-medium">Paiements échoués</p>
-            <p class="text-2xl font-bold text-red-800">{{ failedPayments }}</p>
+            <p class="text-red-700 font-medium text-xs sm:text-sm">Paiements échoués</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-red-800">{{ failedPayments }}</p>
           </router-link>
         </div>
       </div>
     </div>
 
-    <hr class="mb-8 border-gray-200" />
+    <hr class="mb-4 sm:mb-6 md:mb-8 border-gray-200" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-10">
       <div
-        class="bg-white p-6 rounded-xl shadow-lg transition duration-300 col-span-full lg:col-span-2"
+        class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300 col-span-full lg:col-span-2"
       >
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Évolution des Revenus</h2>
-        <div class="h-96">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Évolution des Revenus</h2>
+        <div class="h-64 sm:h-80 md:h-96">
           <canvas ref="paymentAreaChartRef"></canvas>
         </div>
       </div>
 
       <div
-        class="bg-white p-6 rounded-xl shadow-lg transition duration-300 col-span-full lg:col-span-1"
+        class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300 col-span-full lg:col-span-1"
       >
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">
           Répartition des demandes par Type de Visa
         </h2>
-        <div class="h-80 flex items-center justify-center">
+        <div class="h-60 sm:h-72 md:h-80 flex items-center justify-center">
           <canvas ref="visaTypeDoughnutRef"></canvas>
         </div>
       </div>
 
       <div
-        class="bg-white p-6 rounded-xl shadow-lg transition duration-300 col-span-full lg:col-span-2"
+        class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300 col-span-full lg:col-span-2"
       >
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Statistiques Globales des Demandes</h2>
-        <div class="h-96">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Statistiques Globales des Demandes</h2>
+        <div class="h-64 sm:h-80 md:h-96">
           <canvas ref="visaRequestStatsRef"></canvas>
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Résumé du Processus</h2>
+      <div class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300">
+        <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Résumé du Processus</h2>
 
-        <div class="space-y-3">
+        <div class="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
           <router-link
             :to="{ name: 'admin.visarequest', query: { status: 'all' } }"
-            class="block p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500 hover:shadow-md transition duration-300"
+            class="block p-3 sm:p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500 hover:shadow-md transition duration-300"
           >
-            <p class="text-blue-700 font-medium">Total des demandes</p>
-            <p class="text-2xl font-bold text-blue-800">{{ totalVisaRequests }}</p>
+            <p class="text-blue-700 font-medium text-xs sm:text-sm">Total des demandes</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-blue-800">{{ totalVisaRequests }}</p>
           </router-link>
 
           <router-link
             :to="{ name: 'admin.visarequest', query: { status: 'approved' } }"
-            class="block p-4 bg-green-50 rounded-lg border-l-4 border-green-500 hover:shadow-md transition duration-300"
+            class="block p-3 sm:p-4 bg-green-50 rounded-lg border-l-4 border-green-500 hover:shadow-md transition duration-300"
           >
-            <p class="text-green-700 font-medium">Approuvées</p>
-            <p class="text-2xl font-bold text-green-800">{{ approvedVisaRequests }}</p>
+            <p class="text-green-700 font-medium text-xs sm:text-sm">Approuvées</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-green-800">{{ approvedVisaRequests }}</p>
           </router-link>
 
           <router-link
             :to="{ name: 'admin.visarequest', query: { status: 'pending' } }"
-            class="block p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500 hover:shadow-md transition duration-300"
+            class="block p-3 sm:p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500 hover:shadow-md transition duration-300"
           >
-            <p class="text-yellow-700 font-medium">En attente</p>
-            <p class="text-2xl font-bold text-yellow-800">{{ pendingVisaRequests }}</p>
+            <p class="text-yellow-700 font-medium text-xs sm:text-sm">En attente</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-yellow-800">{{ pendingVisaRequests }}</p>
           </router-link>
 
           <router-link
             :to="{ name: 'admin.visarequest', query: { status: 'rejected' } }"
-            class="block p-4 bg-red-50 rounded-lg border-l-4 border-red-500 hover:shadow-md transition duration-300"
+            class="block p-3 sm:p-4 bg-red-50 rounded-lg border-l-4 border-red-500 hover:shadow-md transition duration-300"
           >
-            <p class="text-red-700 font-medium">Rejetées</p>
-            <p class="text-2xl font-bold text-red-800">{{ rejectedVisaRequests }}</p>
+            <p class="text-red-700 font-medium text-xs sm:text-sm">Rejetées</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-red-800">{{ rejectedVisaRequests }}</p>
           </router-link>
         </div>
       </div>
     </div>
 
-    <hr class="mb-8 border-gray-200" />
+    <hr class="mb-4 sm:mb-6 md:mb-8 border-gray-200" />
 
-    <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Dernières Demandes de Visa</h2>
-      <div class="overflow-x-auto">
+    <div class="bg-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg transition duration-300">
+      <h2 class="text-base sm:text-lg md:text-xl font-semibold text-gray-700 mb-3 md:mb-4">Dernières Demandes de Visa</h2>
+
+      <!-- Mobile cards view -->
+      <div class="block md:hidden space-y-3">
+        <div
+          v-for="request in recentVisaRequests"
+          :key="request.id"
+          @click="viewDetails(request.id, request.user.id!)"
+          class="bg-gray-50 rounded-lg p-4 cursor-pointer hover:shadow-md transition duration-300"
+        >
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-sm font-bold text-gray-900">#{{ request.id }}</span>
+            <span
+              class="px-2 py-1 text-xs font-semibold rounded-full"
+              :class="visaRequestStatusColors.get(request.status)"
+            >
+              {{ visaRequestStatusMap.get(request.status) }}
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Utilisateur:</span> {{ request.user?.name || 'N/A' }}</p>
+          <p class="text-sm text-gray-600 mb-1"><span class="font-medium">Type:</span> {{ request.visa_type_name || 'N/A' }}</p>
+          <p class="text-xs text-gray-400">{{ formatDate(request.created_at!) }}</p>
+        </div>
+      </div>
+
+      <!-- Desktop table view -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 ID
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Utilisateur
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Type de visa
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Statut
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="request in recentVisaRequests" :key="request.id" @click="viewDetails(request.id, request.user.id!)" class="cursor-pointer hover:shadow-lg">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+            <tr v-for="request in recentVisaRequests" :key="request.id" @click="viewDetails(request.id, request.user.id!)" class="cursor-pointer hover:bg-gray-50 transition">
+              <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 #{{ request.id }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ request.user?.name || 'N/A' }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ request.visa_type_name || 'N/A' }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
                 <span
                   class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                   :class="visaRequestStatusColors.get(request.status)"
@@ -237,7 +252,7 @@
                   {{ visaRequestStatusMap.get(request.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(request.created_at!) }}
               </td>
             </tr>

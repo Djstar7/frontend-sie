@@ -91,8 +91,8 @@ const validate = () => {
   errors.value = {}
   if (!isValid) {
     for (const key in validationErrors) {
-      const msg = validationErrors[key]![0]
-      errors.value[key] = msg
+      const msg = (validationErrors as Record<string, string[]>)[key]?.[0]
+      if (msg) errors.value[key] = msg
     }
   }
 

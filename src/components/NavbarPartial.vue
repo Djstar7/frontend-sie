@@ -20,18 +20,19 @@ const isName = computed(() =>
 <template>
   <header class="bg-white/80 backdrop-blur-md fixed w-full shadow-md top-0 z-50 transition-all">
     <div
-      class="w-full mx-auto px-4 relative sm:px-6 lg:px-10 flex items-center justify-between h-20"
+      class="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-10 flex items-center justify-between h-16 sm:h-18 md:h-20"
     >
-      <div class="flex items-center space-x-3">
-        <img src="@/assets/images/logo.png" alt="Logo" class="h-24 w-24 object-cover" />
+      <div class="flex items-center">
+        <img src="@/assets/images/logo.png" alt="Logo" class="h-14 w-14 sm:h-18 sm:w-18 md:h-20 md:w-20 lg:h-24 lg:w-24 object-cover" />
       </div>
 
-      <nav class="hidden md:flex space-x-8 items-center font-medium">
+      <nav class="hidden md:flex space-x-4 lg:space-x-8 items-center font-medium">
         <router-link
           :to="{ name: 'home' }"
-          class="relative md:text-sm group text-gray-700 lg:text-xl flex items-center gap-2"
+          class="relative text-sm lg:text-base xl:text-lg group text-gray-700 flex items-center gap-1 lg:gap-2"
         >
-          <i class="fas fa-house text-blue-600"></i> Accueil
+          <i class="fas fa-house text-blue-600"></i>
+          <span class="hidden lg:inline">Accueil</span>
           <span
             class="absolute left-0 -bottom-1 h-[2px] bg-blue-600 transition-all duration-300"
             :class="{ 'w-full': routeName === 'home', 'w-0 group-hover:w-full': true }"
@@ -40,9 +41,10 @@ const isName = computed(() =>
 
         <router-link
           :to="{ name: 'contact' }"
-          class="relative md:text-sm group text-gray-700 lg:text-xl flex items-center gap-2"
+          class="relative text-sm lg:text-base xl:text-lg group text-gray-700 flex items-center gap-1 lg:gap-2"
         >
-          <i class="fas fa-phone text-orange-400"></i> Contact
+          <i class="fas fa-phone text-orange-400"></i>
+          <span class="hidden lg:inline">Contact</span>
           <span
             class="absolute left-0 -bottom-1 h-[2px] bg-orange-400 transition-all"
             :class="{ 'w-full': routeName === 'contact', 'w-0 group-hover:w-full': true }"
@@ -51,9 +53,10 @@ const isName = computed(() =>
 
         <router-link
           :to="{ name: 'about' }"
-          class="relative md:text-sm group text-gray-700 lg:text-xl flex items-center gap-2"
+          class="relative text-sm lg:text-base xl:text-lg group text-gray-700 flex items-center gap-1 lg:gap-2"
         >
-          <i class="fas fa-info-circle mr-2 text-purple-600"></i> À propos
+          <i class="fas fa-info-circle text-purple-600"></i>
+          <span class="hidden lg:inline">À propos</span>
           <span
             class="absolute left-0 -bottom-1 h-[2px] bg-purple-600 transition-all"
             :class="{ 'w-full': routeName === 'about', 'w-0 group-hover:w-full': true }"
@@ -63,15 +66,15 @@ const isName = computed(() =>
         <div v-if="!isName">
           <router-link
             :to="{ name: 'custom.dashboard' }"
-            class="ml-6 px-6 py-2 text-white lg:text-xl font-semibold bg-blue-800 rounded-full shadow-md hover:scale-105 hover:shadow-lg transition-all"
+            class="ml-2 lg:ml-6 px-3 lg:px-6 py-2 text-white text-sm lg:text-base xl:text-lg font-semibold bg-blue-800 rounded-full shadow-md hover:scale-105 hover:shadow-lg transition-all whitespace-nowrap"
           >
-            {{ isConnect ? 'Tableau de bord' : 'Commencer le suivi' }}
+            {{ isConnect ? 'Tableau de bord' : 'Commencer' }}
           </router-link>
         </div>
       </nav>
 
       <div class="md:hidden">
-        <button @click="open = !open" class="focus:outline-none text-2xl text-gray-800">
+        <button @click="open = !open" class="focus:outline-none text-xl sm:text-2xl text-gray-800 p-2">
           <i v-if="!open" class="fas fa-bars"></i>
           <i v-else class="fas fa-xmark"></i>
         </button>
@@ -79,32 +82,36 @@ const isName = computed(() =>
     </div>
 
     <transition name="slide-fade">
-      <div v-show="open" class="md:hidden bg-white border-t border-gray-200 shadow-lg">
+      <div v-show="open" class="md:hidden bg-white border-t border-gray-200 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
         <router-link
           :to="{ name: 'home' }"
-          class="block px-6 py-3 text-gray-700 text-lg hover:text-blue-600"
+          @click="open = false"
+          class="block px-4 sm:px-6 py-3 text-gray-700 text-base sm:text-lg hover:text-blue-600 hover:bg-blue-50 transition-colors"
         >
-          <i class="fas fa-house"></i> Accueil
+          <i class="fas fa-house mr-2"></i> Accueil
         </router-link>
 
         <router-link
           :to="{ name: 'contact' }"
-          class="block px-6 py-3 text-gray-700 text-lg hover:text-orange-400"
+          @click="open = false"
+          class="block px-4 sm:px-6 py-3 text-gray-700 text-base sm:text-lg hover:text-orange-400 hover:bg-orange-50 transition-colors"
         >
-          <i class="fas fa-envelope"></i> Contact
+          <i class="fas fa-envelope mr-2"></i> Contact
         </router-link>
 
         <router-link
           :to="{ name: 'about' }"
-          class="block px-6 py-3 text-gray-700 text-lg hover:text-purple-600"
+          @click="open = false"
+          class="block px-4 sm:px-6 py-3 text-gray-700 text-base sm:text-lg hover:text-purple-600 hover:bg-purple-50 transition-colors"
         >
-          <i class="fas fa-info-circle"></i> À propos
+          <i class="fas fa-info-circle mr-2"></i> À propos
         </router-link>
 
-        <div v-if="!isName" class="flex flex-col px-6 py-4 gap-3">
+        <div v-if="!isName" class="flex flex-col px-4 sm:px-6 py-4 gap-3 border-t border-gray-100">
           <router-link
             :to="{ name: 'custom.dashboard' }"
-            class="w-full px-6 py-3 bg-blue-600 text-white rounded-full hover:scale-105 transition-all"
+            @click="open = false"
+            class="w-full px-4 sm:px-6 py-3 bg-blue-600 text-white text-center rounded-full hover:bg-blue-700 transition-all text-sm sm:text-base font-medium"
           >
             {{ isConnect ? 'Tableau de bord' : 'Commencer le suivi' }}
           </router-link>

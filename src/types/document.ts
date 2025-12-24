@@ -8,7 +8,7 @@ interface Document {
   updated_at?: string
 }
 interface Validation {
-  required: true
+  required: boolean
   fileTypes: string[]
   maxSizeMB: number
 }

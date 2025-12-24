@@ -285,7 +285,8 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.meta.roles && userStore.isAuthenticated) {
-    if (!to.meta.roles.includes(userStore.role)) {
+    const roles = to.meta.roles as string[]
+    if (!roles.includes(userStore.role as string)) {
       const dashboard = getDashboardRoute(userStore.role!)
       if (to.name !== dashboard.name) return next(dashboard)
     }

@@ -81,57 +81,57 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <h2 class="text-3xl font-bold text-center text-purple-600 mb-6">Inscription</h2>
-  <form @submit.prevent="handleRegister" class="space-y-4">
+  <h2 class="text-2xl sm:text-3xl font-bold text-center text-purple-600 mb-4 sm:mb-6">Inscription</h2>
+  <form @submit.prevent="handleRegister" class="space-y-3 sm:space-y-4">
     <!-- Name -->
     <div class="relative">
-      <label for="name" class="block text-md font-medium text-gray-700">Pseudo</label>
-      <i class="fas fa-user absolute left-3 top-10 text-gray-400"></i>
+      <label for="name" class="block text-sm sm:text-base font-medium text-gray-700">Pseudo</label>
+      <i class="fas fa-user absolute left-3 top-9 sm:top-10 text-gray-400 text-sm sm:text-base"></i>
       <input
         type="text"
         id="name"
         v-model="form.name"
         placeholder="Votre pseudo"
         :class="[
-          'mt-1 block w-full pl-10 px-4 py-2 text-xl border rounded-md shadow-md focus:outline-none md:text-md',
+          'mt-1 block w-full pl-9 sm:pl-10 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-md shadow-md focus:outline-none',
           errors.name
             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500',
         ]"
       />
-      <p v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</p>
+      <p v-if="errors.name" class="text-red-600 text-xs sm:text-sm mt-1">{{ errors.name }}</p>
     </div>
 
     <!-- Email -->
     <div class="relative">
-      <label for="email" class="block text-md font-medium text-gray-700">Email</label>
-      <i class="fas fa-envelope absolute left-3 top-10 text-gray-400"></i>
+      <label for="email" class="block text-sm sm:text-base font-medium text-gray-700">Email</label>
+      <i class="fas fa-envelope absolute left-3 top-9 sm:top-10 text-gray-400 text-sm sm:text-base"></i>
       <input
         type="email"
         id="email"
         v-model="form.email"
         placeholder="exemple@email.com"
         :class="[
-          'mt-1 block w-full pl-10 px-4 py-2 text-xl border rounded-md shadow-md focus:outline-none md:text-md',
+          'mt-1 block w-full pl-9 sm:pl-10 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-md shadow-md focus:outline-none',
           errors.email
             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500',
         ]"
       />
-      <p v-if="errors.email" class="text-red-600 text-sm mt-1">{{ errors.email }}</p>
+      <p v-if="errors.email" class="text-red-600 text-xs sm:text-sm mt-1">{{ errors.email }}</p>
     </div>
 
     <!-- Password -->
     <div class="relative">
-      <label for="password" class="block text-md font-medium text-gray-700">Mot de passe</label>
-      <i class="fas fa-lock absolute left-3 top-10 text-gray-400"></i>
+      <label for="password" class="block text-sm sm:text-base font-medium text-gray-700">Mot de passe</label>
+      <i class="fas fa-lock absolute left-3 top-9 sm:top-10 text-gray-400 text-sm sm:text-base"></i>
       <input
         :type="showPassword ? 'text' : 'password'"
         id="password"
         v-model="form.password"
         placeholder="Votre mot de passe"
         :class="[
-          'mt-1 block w-full pl-10 pr-10 py-2 text-xl border rounded-md shadow-md focus:outline-none md:text-md',
+          'mt-1 block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border rounded-md shadow-md focus:outline-none',
           errors.password
             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500',
@@ -140,24 +140,24 @@ const handleRegister = async () => {
       <i
         :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
         @click="showPassword = !showPassword"
-        class="absolute right-3 top-10 text-gray-600 cursor-pointer"
+        class="absolute right-3 top-9 sm:top-10 text-gray-600 cursor-pointer text-sm sm:text-base"
       ></i>
-      <p v-if="errors.password" class="text-red-600 text-sm mt-1">{{ errors.password }}</p>
+      <p v-if="errors.password" class="text-red-600 text-xs sm:text-sm mt-1">{{ errors.password }}</p>
     </div>
 
     <!-- Confirm Password -->
     <div class="relative">
-      <label for="confirmPassword" class="block text-md font-medium text-gray-700"
+      <label for="confirmPassword" class="block text-sm sm:text-base font-medium text-gray-700"
         >Confirmer le mot de passe</label
       >
-      <i class="fas fa-lock absolute left-3 top-10 text-gray-400"></i>
+      <i class="fas fa-lock absolute left-3 top-9 sm:top-10 text-gray-400 text-sm sm:text-base"></i>
       <input
         :type="showConfirmPassword ? 'text' : 'password'"
         id="confirmPassword"
         v-model="form.confirmPassword"
         placeholder="Confirmez le mot de passe"
         :class="[
-          'mt-1 block w-full pl-10 pr-10 py-2 text-xl border rounded-md shadow-md focus:outline-none md:text-md',
+          'mt-1 block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border rounded-md shadow-md focus:outline-none',
           errors.confirmPassword
             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
             : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500',
@@ -166,9 +166,9 @@ const handleRegister = async () => {
       <i
         :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
         @click="showConfirmPassword = !showConfirmPassword"
-        class="absolute right-3 top-10 text-gray-600 cursor-pointer"
+        class="absolute right-3 top-9 sm:top-10 text-gray-600 cursor-pointer text-sm sm:text-base"
       ></i>
-      <p v-if="errors.confirmPassword" class="text-red-600 text-sm mt-1">
+      <p v-if="errors.confirmPassword" class="text-red-600 text-xs sm:text-sm mt-1">
         {{ errors.confirmPassword }}
       </p>
     </div>
@@ -178,11 +178,12 @@ const handleRegister = async () => {
       <button
         type="submit"
         :disabled="isLoading"
-        class="w-full flex items-center justify-center gap-2 py-2 px-4 text-lg font-medium text-white rounded-xl shadow-md transition-colors duration-300 bg-indigo-600 hover:bg-orange-400 disabled:opacity-70 disabled:cursor-not-allowed"
+        class="w-full flex items-center justify-center gap-2 py-2 sm:py-2.5 px-4 text-sm sm:text-lg font-medium text-white rounded-lg sm:rounded-xl shadow-md transition-colors duration-300 bg-indigo-600 hover:bg-orange-400 disabled:opacity-70 disabled:cursor-not-allowed"
       >
         <span v-if="isLoading" class="flex items-center gap-2">
           <i class="fas fa-spinner fa-spin"></i>
-          Inscription...
+          <span class="hidden sm:inline">Inscription...</span>
+          <span class="sm:hidden">...</span>
         </span>
         <span v-else class="flex items-center gap-2">
           <i class="fas fa-user-plus"></i>
@@ -192,7 +193,7 @@ const handleRegister = async () => {
     </div>
   </form>
 
-  <p class="mt-6 text-md text-gray-600">
+  <p class="mt-4 sm:mt-6 text-sm sm:text-base text-gray-600 text-center">
     Déjà un compte ?
     <router-link
       :to="{ name: 'auth.login' }"

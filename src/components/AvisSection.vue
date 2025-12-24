@@ -1,25 +1,25 @@
 <template>
   <div class="bg-white">
-    <section class="py-24 bg-gray-50 overflow-hidden">
-      <div class="container mx-auto px-4 sm:px-6">
-        <div class="flex flex-col lg:flex-row items-center gap-16">
+    <section class="py-12 sm:py-16 md:py-20 lg:py-24 bg-gray-50 overflow-hidden">
+      <div class="container mx-auto px-3 sm:px-4 md:px-6">
+        <div class="flex flex-col lg:flex-row items-center gap-8 sm:gap-12 md:gap-16">
           <div class="lg:w-1/2">
             <span
-              class="text-sm font-semibold uppercase text-red-600 tracking-wider flex items-center gap-2 mb-2"
+              class="text-xs sm:text-sm font-semibold uppercase text-red-600 tracking-wider flex items-center gap-2 mb-2"
             >
               <i class="fa-solid fa-plane-departure"></i> Certification
             </span>
-            <h2 class="text-3xl sm:text-5xl font-extrabold text-blue-900 mb-4 mt-2">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 sm:mb-4 mt-2">
               Agence Légalement Accréditée
             </h2>
-            <p class="text-lg text-gray-700 leading-relaxed">
+            <p class="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
               <strong>Immigration de l'Estuaire</strong> est une agence agréée et certifiée...
             </p>
           </div>
 
-          <div class="lg:w-1/2">
+          <div class="lg:w-1/2 w-full">
             <div
-              class="grid grid-cols-3 gap-4 sm:gap-6 p-4 bg-white rounded-xl shadow-2xl border border-blue-100"
+              class="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl shadow-2xl border border-blue-100"
             >
               <div
                 v-for="(img, idx) in certImages"
@@ -38,28 +38,29 @@
       </div>
     </section>
 
-    <section v-if="isLoggedIn" class="py-12 bg-purple-50">
-      <div class="container mx-auto px-4 sm:px-6 max-w-3xl">
-        <div class="flex items-center justify-between mb-6">
+    <section v-if="isLoggedIn" class="py-8 sm:py-10 md:py-12 bg-purple-50">
+      <div class="container mx-auto px-3 sm:px-4 md:px-6 max-w-3xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
           <div>
             <span
-              class="text-sm font-semibold uppercase text-red-600 tracking-wider flex items-center gap-2"
+              class="text-xs sm:text-sm font-semibold uppercase text-red-600 tracking-wider flex items-center gap-2"
             >
               <i class="fa-solid fa-pen-to-square"></i> Partagez votre Expérience
             </span>
-            <h3 class="text-2xl font-extrabold text-blue-900 mt-1">Donnez votre avis</h3>
-            <p class="text-sm text-gray-600 mt-1">
+            <h3 class="text-xl sm:text-2xl font-extrabold text-blue-900 mt-1">Donnez votre avis</h3>
+            <p class="text-xs sm:text-sm text-gray-600 mt-1">
               Vous pouvez ajouter, modifier ou supprimer vos avis.
             </p>
           </div>
 
-          <div>
+          <div class="flex-shrink-0">
             <button
               @click="toggleCreateForm"
-              class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow hover:from-blue-700 hover:to-purple-700 transition"
+              class="px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow hover:from-blue-700 hover:to-purple-700 transition text-sm sm:text-base"
             >
-              <i :class="createFormOpen ? 'fas fa-times mr-2' : 'fas fa-plus mr-2'"></i>
-              <span>{{ createFormOpen ? 'Fermer' : 'Ajouter un avis' }}</span>
+              <i :class="createFormOpen ? 'fas fa-times mr-1 sm:mr-2' : 'fas fa-plus mr-1 sm:mr-2'"></i>
+              <span class="hidden sm:inline">{{ createFormOpen ? 'Fermer' : 'Ajouter un avis' }}</span>
+              <span class="sm:hidden">{{ createFormOpen ? 'Fermer' : 'Ajouter' }}</span>
             </button>
           </div>
         </div>
@@ -123,22 +124,22 @@
       </div>
     </section>
 
-    <section class="py-24 bg-white">
-      <div class="container mx-auto px-4 sm:px-6">
-        <div class="text-center mb-16">
+    <section class="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+      <div class="container mx-auto px-3 sm:px-4 md:px-6">
+        <div class="text-center mb-8 sm:mb-12 md:mb-16">
           <span
-            class="text-sm font-semibold uppercase text-red-600 tracking-wider flex items-center justify-center gap-2 mb-2"
+            class="text-xs sm:text-sm font-semibold uppercase text-red-600 tracking-wider flex items-center justify-center gap-2 mb-2"
           >
             <i class="fa-solid fa-star"></i> Témoignages
           </span>
-          <h2 class="text-3xl sm:text-5xl font-extrabold text-blue-900 mb-4 mt-2">
+          <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 sm:mb-4 mt-2">
             Ce que disent nos clients
           </h2>
-          <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p class="text-sm sm:text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-2">
             Découvrez les retours d'expériences vérifiés de notre communauté.
           </p>
 
-          <p v-if="!isLoggedIn" class="mt-4 text-blue-600 font-semibold">
+          <p v-if="!isLoggedIn" class="mt-3 sm:mt-4 text-blue-600 font-semibold text-sm sm:text-base">
             Connectez-vous pour pouvoir ajouter, modifier ou supprimer votre propre avis !
           </p>
         </div>

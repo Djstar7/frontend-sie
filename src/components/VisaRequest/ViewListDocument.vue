@@ -69,25 +69,24 @@ const submitVisaRequest = async () => {
       nationality: visaData.value.nationality!,
     }
 
-    let requestIdToUse: string;
+    let requestIdToUse: string
 
     if (visaRequestStore.visaRequestId === null) {
       const res = await visaRequestStore.createVisaRequest(payload)
       if (!res || !res.data.id) throw new Error('Erreur lors de la création de la demande de visa')
-      requestIdToUse = res.data.id;
+      requestIdToUse = res.data.id
       toastSuccess(res.message || 'Demande de visa créée avec succès')
     } else {
-      requestIdToUse = visaRequestStore.visaRequestId;
+      requestIdToUse = visaRequestStore.visaRequestId
     }
 
     router.push({
       name: 'custom.visarequest.create.upload',
       params: { visaRequestId: requestIdToUse },
     })
-
   } catch (e) {
     console.error('Erreur soumission demande de visa:', e)
-    toastError("Une erreur est survenue lors du lancement de la procédure.")
+    toastError('Une erreur est survenue lors du lancement de la procédure.')
   }
 }
 
@@ -104,8 +103,7 @@ const deleteProcessing = () => {
 
 <template>
   <div class="w-full min-h-screen">
-    <div class=" bg-white p-4 md:p-8 rounded-2xl shadow-xl border border-gray-100">
-
+    <div class="bg-white p-4 md:p-8 rounded-2xl shadow-xl border border-gray-100">
       <header class="text-center w-full mb-8">
         <div class="inline-block p-3 bg-purple-50 rounded-full mb-3 border border-purple-200">
           <i class="fas fa-plane-departure text-4xl text-purple-700 animate-pulse duration-500"></i>
@@ -114,40 +112,65 @@ const deleteProcessing = () => {
           Votre Dossier est Prêt !
         </h1>
         <p class="text-gray-500 mt-1 text-base max-w-4xl mx-auto">
-          **Vérifiez les détails finaux** avant de passer à l'étape d'envoi de vos pièces justificatives.
+          **Vérifiez les détails finaux** avant de passer à l'étape d'envoi de vos pièces
+          justificatives.
         </p>
       </header>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-
-        <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-default min-h-[120px] flex flex-col justify-between">
-          <div class="w-10 h-10 flex items-center justify-center rounded-full text-xl mb-1 shadow-md bg-indigo-600 text-white">
+        <div
+          class="p-4 rounded-xl bg-indigo-50 border border-indigo-200 shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-default min-h-[120px] flex flex-col justify-between"
+        >
+          <div
+            class="w-10 h-10 flex items-center justify-center rounded-full text-xl mb-1 shadow-md bg-indigo-600 text-white"
+          >
             <i class="fas fa-globe"></i>
           </div>
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-indigo-700">Destination</h2>
-          <p class="text-xl font-bold tracking-tight text-gray-800 mt-0.5">{{ visaData?.country || 'N/A' }}</p>
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-indigo-700">
+            Destination
+          </h2>
+          <p class="text-xl font-bold tracking-tight text-gray-800 mt-0.5">
+            {{ visaData?.country || 'N/A' }}
+          </p>
         </div>
 
-        <div class="p-4 rounded-xl bg-purple-50 border border-purple-200 shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-default min-h-[120px] flex flex-col justify-between">
-          <div class="w-10 h-10 flex items-center justify-center rounded-full text-xl mb-1 shadow-md bg-purple-600 text-white">
+        <div
+          class="p-4 rounded-xl bg-purple-50 border border-purple-200 shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-default min-h-[120px] flex flex-col justify-between"
+        >
+          <div
+            class="w-10 h-10 flex items-center justify-center rounded-full text-xl mb-1 shadow-md bg-purple-600 text-white"
+          >
             <i class="fas fa-passport"></i>
           </div>
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-purple-700">Type de Visa</h2>
-          <p class="text-xl font-bold tracking-tight text-gray-800 mt-0.5">{{ visaData?.visa_type || 'N/A' }}</p>
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-purple-700">
+            Type de Visa
+          </h2>
+          <p class="text-xl font-bold tracking-tight text-gray-800 mt-0.5">
+            {{ visaData?.visa_type || 'N/A' }}
+          </p>
         </div>
 
-        <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-default min-h-[120px] flex flex-col justify-between">
-          <div class="w-10 h-10 flex items-center justify-center rounded-full text-xl mb-1 shadow-md bg-rose-600 text-white">
+        <div
+          class="p-4 rounded-xl bg-rose-50 border border-rose-200 shadow-md transition-all duration-300 transform hover:scale-[1.01] cursor-default min-h-[120px] flex flex-col justify-between"
+        >
+          <div
+            class="w-10 h-10 flex items-center justify-center rounded-full text-xl mb-1 shadow-md bg-rose-600 text-white"
+          >
             <i :class="getIconClass(visaData?.status_mat!)"></i>
           </div>
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-rose-700">Statut Matrimonial</h2>
-          <p class="text-xl font-bold tracking-tight text-gray-800 mt-0.5">{{ getStatus(visaData?.status_mat!) }}</p>
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-rose-700">
+            Statut Matrimonial
+          </h2>
+          <p class="text-xl font-bold tracking-tight text-gray-800 mt-0.5">
+            {{ getStatus(visaData?.status_mat!) }}
+          </p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-
-        <div class="p-5 rounded-xl bg-green-50 border border-green-300 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center min-h-[120px]">
+        <div
+          class="p-5 rounded-xl bg-green-50 border border-green-300 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center min-h-[120px]"
+        >
           <h2 class="text-base font-semibold text-green-700 flex items-center mb-1">
             <i class="fas fa-money-bill-wave text-xl mr-2"></i>
             Coût de Traitement (Base)
@@ -158,15 +181,21 @@ const deleteProcessing = () => {
           <p class="text-xs text-gray-500 mt-1">*Hors frais de dossier/service additionnels</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-yellow-50 border border-yellow-300 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center min-h-[120px]">
+        <div
+          class="p-5 rounded-xl bg-yellow-50 border border-yellow-300 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-center min-h-[120px]"
+        >
           <h2 class="text-base font-semibold text-orange-700 flex items-center mb-1">
             <i class="fas fa-hourglass-half text-xl mr-2"></i>
             Délai Estimé
           </h2>
           <p class="text-4xl font-extrabold text-orange-600 mt-1">
-            {{ visaData?.processing_duration_min || '?' }} - {{ visaData?.processing_duration_max || '?' }} <span class="text-2xl font-bold">jours</span>
+            {{ visaData?.processing_duration_min || '?' }} -
+            {{ visaData?.processing_duration_max || '?' }}
+            <span class="text-2xl font-bold">jours</span>
           </p>
-          <p class="text-xs text-gray-500 mt-1">*Le délai peut varier selon la période et l'ambassade</p>
+          <p class="text-xs text-gray-500 mt-1">
+            *Le délai peut varier selon la période et l'ambassade
+          </p>
         </div>
       </div>
 
@@ -191,14 +220,18 @@ const deleteProcessing = () => {
             </p>
           </li>
         </ul>
-        <p v-if="!visaData?.documents || visaData.documents.length === 0" class="text-center text-gray-500 italic py-4 text-sm">
+        <p
+          v-if="!visaData?.documents || visaData.documents.length === 0"
+          class="text-center text-gray-500 italic py-4 text-sm"
+        >
           <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
           Aucun document requis trouvé pour ce type de visa.
         </p>
       </div>
 
-      <div class="flex flex-col-reverse md:flex-row w-full justify-end gap-4 pt-6 border-t border-gray-200">
-
+      <div
+        class="flex flex-col-reverse md:flex-row w-full justify-end gap-4 pt-6 border-t border-gray-200"
+      >
         <button
           class="flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-md"
           @click="deleteProcessing"

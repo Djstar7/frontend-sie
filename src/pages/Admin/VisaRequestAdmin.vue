@@ -1,21 +1,21 @@
 <template>
-  <div class="min-h-screen w-full bg-gray-50 flex flex-col p-6">
+  <div class="min-h-screen w-full bg-gray-50 flex flex-col p-3 sm:p-4 md:p-6">
     <h2
-      class="text-4xl font-bold justify-center mb-6 text-orange-500 border-b-4 border-orange-200 pb-2 flex items-center gap-3"
+      class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold justify-center mb-4 sm:mb-6 text-orange-500 border-b-2 sm:border-b-4 border-orange-200 pb-2 flex items-center gap-2 sm:gap-3"
     >
       <i class="fas fa-passport"></i> Gestion des Demandes de Visa
     </h2>
 
-    <div class="flex flex-wrap gap-4 w-full mb-6 items-center bg-white p-4 rounded-lg shadow-sm">
+    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full mb-4 sm:mb-6 items-stretch sm:items-center bg-white p-3 sm:p-4 rounded-lg shadow-sm">
       <input
         type="text"
         v-model="filter"
         placeholder="Rechercher (Nom, Email, Type de visa...)"
-        class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 transition duration-150"
+        class="flex-1 w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 transition duration-150"
       />
       <select
         v-model="filterStatus"
-        class="min-w-[150px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 capitalize transition duration-150"
+        class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 capitalize transition duration-150"
       >
         <option value="">Tous les statuts</option>
         <option value="created">Créée (en attente doc)</option>
@@ -26,125 +26,156 @@
       </select>
     </div>
 
-    <div v-if="loading" class="text-center py-12 text-orange-500 font-medium text-lg">
+    <div v-if="loading" class="text-center py-8 sm:py-12 text-orange-500 font-medium text-base sm:text-lg">
       <i class="fas fa-spinner fa-spin mr-2"></i> Chargement des demandes de visa...
     </div>
 
-    <div v-else class="flex-1 overflow-auto bg-white rounded-lg shadow-xl border border-gray-200">
-      <table class="w-full border-collapse min-w-full">
-        <thead class="sticky top-0 bg-orange-100 z-10 border-b-2 border-orange-300">
-          <tr>
-            <th
-              class="px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase w-[10%]"
+    <div v-else class="flex-1 bg-white rounded-lg shadow-xl border border-gray-200">
+      <!-- Mobile cards view -->
+      <div class="block lg:hidden p-3 space-y-3">
+        <div
+          v-for="req in paginatedRequests"
+          :key="req.id"
+          @click="viewDetails(req.id!, req.user.id!)"
+          class="bg-gray-50 rounded-lg p-4 border border-gray-200 cursor-pointer hover:shadow-md transition"
+        >
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="font-semibold text-gray-900 text-sm">{{ req.user?.name || 'N/A' }}</p>
+              <p class="text-gray-500 text-xs">{{ req.user?.email || 'N/A' }}</p>
+            </div>
+            <span
+              :class="[
+                visaRequestStatusColors.get(req.status),
+                'font-semibold',
+                'px-2 py-1 rounded-full text-xs',
+              ]"
             >
-              Date
-            </th>
-            <th
-              class="px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase w-[20%]"
+              {{ visaRequestStatusMap.get(req.status) }}
+            </span>
+          </div>
+          <div class="space-y-1 text-sm text-gray-600 mb-3">
+            <p><i class="fas fa-plane-departure mr-2 text-blue-500"></i>{{ req.visa_type_name || 'N/A' }}</p>
+            <p><span class="font-medium">Destination:</span> {{ req.country_dest_name || 'N/A' }}</p>
+            <p class="text-xs text-gray-400">{{ formatDateDayMonthYear(req.created_at!) }}</p>
+          </div>
+          <div class="flex justify-end pt-2 border-t border-gray-200">
+            <button
+              @click.stop="confirmDelete(req.id!)"
+              class="flex items-center gap-2 text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg transition text-sm font-medium"
             >
-              Utilisateur
-            </th>
-            <th
-              class="px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase w-[15%]"
-            >
-              Type de Visa
-            </th>
-            <th
-              class="px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase w-[15%]"
-            >
-              Destination
-            </th>
-            <th
-              class="px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase w-[15%]"
-            >
-              Statut
-            </th>
-            <th
-              class="px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase w-[15%]"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <tr
-            v-for="req in paginatedRequests"
-            :key="req.id"
-            class="hover:bg-orange-50 transition duration-100 cursor-pointer"
-            @click="viewDetails(req.id!, req.user.id!)"
-          >
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
-              {{ formatDateDayMonthYear(req.created_at!) }}
-            </td>
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        </div>
+        <div v-if="paginatedRequests.length === 0" class="text-center py-6 text-gray-400 font-medium">
+          <i class="fas fa-info-circle mr-2"></i> Aucune demande trouvée.
+        </div>
+      </div>
 
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-              <div class="font-medium text-gray-900">{{ req.user?.name || 'N/A' }}</div>
-              <div class="text-gray-500">{{ req.user?.email || 'N/A' }}</div>
-            </td>
+      <!-- Desktop table view -->
+      <div class="hidden lg:block overflow-auto">
+        <table class="w-full border-collapse min-w-full">
+          <thead class="sticky top-0 bg-orange-100 z-10 border-b-2 border-orange-300">
+            <tr>
+              <th class="px-4 xl:px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase">
+                Date
+              </th>
+              <th class="px-4 xl:px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase">
+                Utilisateur
+              </th>
+              <th class="px-4 xl:px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase">
+                Type de Visa
+              </th>
+              <th class="px-4 xl:px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase">
+                Destination
+              </th>
+              <th class="px-4 xl:px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase">
+                Statut
+              </th>
+              <th class="px-4 xl:px-6 py-3 text-orange-500 font-bold text-sm tracking-wider uppercase">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-100">
+            <tr
+              v-for="req in paginatedRequests"
+              :key="req.id"
+              class="hover:bg-orange-50 transition duration-100 cursor-pointer"
+              @click="viewDetails(req.id!, req.user.id!)"
+            >
+              <td class="px-4 xl:px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
+                {{ formatDateDayMonthYear(req.created_at!) }}
+              </td>
 
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-              <i class="fas fa-plane-departure mr-2 text-blue-500"></i
-              >{{ req.visa_type_name || 'N/A' }}
-            </td>
+              <td class="px-4 xl:px-6 py-4 whitespace-nowrap text-sm">
+                <div class="font-medium text-gray-900">{{ req.user?.name || 'N/A' }}</div>
+                <div class="text-gray-500">{{ req.user?.email || 'N/A' }}</div>
+              </td>
 
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ req.country_dest_name || 'N/A' }}
-            </td>
+              <td class="px-4 xl:px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                <i class="fas fa-plane-departure mr-2 text-blue-500"></i>{{ req.visa_type_name || 'N/A' }}
+              </td>
 
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                :class="[
-                  visaRequestStatusColors.get(req.status),
-                  'font-semibold',
-                  'px-3 py-1 rounded-full text-xs',
-                ]"
-              >
-                {{ visaRequestStatusMap.get(req.status) }}
-              </span>
-            </td>
+              <td class="px-4 xl:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ req.country_dest_name || 'N/A' }}
+              </td>
 
-            <td class="px-6 py-4 whitespace-nowrap font-medium">
-              <div class="flex items-center text-xl">
-                <button
-                  @click.stop="confirmDelete(req.id!)"
-                  class="text-red-600 hover:text-red-800 transition"
-                  title="Supprimer la demande"
+              <td class="px-4 xl:px-6 py-4 whitespace-nowrap">
+                <span
+                  :class="[
+                    visaRequestStatusColors.get(req.status),
+                    'font-semibold',
+                    'px-3 py-1 rounded-full text-xs',
+                  ]"
                 >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="paginatedRequests.length === 0">
-            <td colspan="6" class="text-center py-6 text-gray-400 font-medium text-lg">
-              <i class="fas fa-info-circle mr-2"></i> Aucune demande de visa trouvée correspondant
-              aux critères.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                  {{ visaRequestStatusMap.get(req.status) }}
+                </span>
+              </td>
+
+              <td class="px-4 xl:px-6 py-4 whitespace-nowrap font-medium">
+                <div class="flex items-center text-xl">
+                  <button
+                    @click.stop="confirmDelete(req.id!)"
+                    class="text-red-600 hover:text-red-800 transition"
+                    title="Supprimer la demande"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="paginatedRequests.length === 0">
+              <td colspan="6" class="text-center py-6 text-gray-400 font-medium text-lg">
+                <i class="fas fa-info-circle mr-2"></i> Aucune demande de visa trouvée correspondant aux critères.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div
-      class="flex justify-between items-center mt-6 px-4 py-3 bg-white rounded-lg shadow-md border border-gray-200"
+      class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 sm:mt-6 px-3 sm:px-4 py-3 bg-white rounded-lg shadow-md border border-gray-200"
     >
       <button
         @click="prevPage"
         :disabled="currentPage === 1"
-        class="px-4 py-2 border rounded-full text-orange-600 border-orange-300 disabled:opacity-50 hover:bg-orange-50 transition font-medium flex items-center gap-2"
+        class="w-full sm:w-auto px-3 sm:px-4 py-2 border rounded-full text-orange-600 border-orange-300 disabled:opacity-50 hover:bg-orange-50 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
       >
-        <i class="fas fa-arrow-left"></i> Précédent
+        <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Précédent</span>
       </button>
-      <span class="text-gray-500 font-semibold">
+      <span class="text-gray-500 font-semibold text-sm sm:text-base text-center">
         Page {{ currentPage }} / {{ totalPages }}
-        <span class="text-sm text-gray-500 ml-2">({{ filteredRequests.length }} résultats)</span>
+        <span class="text-xs sm:text-sm text-gray-500 ml-1 sm:ml-2">({{ filteredRequests.length }} résultats)</span>
       </span>
       <button
         @click="nextPage"
         :disabled="currentPage === totalPages"
-        class="px-4 py-2 border rounded-full text-orange-600 border-orange-300 disabled:opacity-50 hover:bg-orange-50 transition font-medium flex items-center gap-2"
+        class="w-full sm:w-auto px-3 sm:px-4 py-2 border rounded-full text-orange-600 border-orange-300 disabled:opacity-50 hover:bg-orange-50 transition font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
       >
-        Suivant <i class="fas fa-arrow-right"></i>
+        <span class="hidden sm:inline">Suivant</span> <i class="fas fa-arrow-right"></i>
       </button>
     </div>
 

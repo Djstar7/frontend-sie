@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useNotificationStore } from '@/stores/notificationStore'
 import type { Notification } from '@/types/notification'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { onUnmounted } from 'vue'
 
 // --- Props et Événements ---
 const props = defineProps<{ isOpen: boolean }>()
@@ -18,26 +19,46 @@ const selectedNotif = ref<Notification | null>(null)
 const showModal = ref(false)
 const filter = ref<'all' | 'unread' | 'read'>('all')
 const isLoggedIn = computed(() => !!userStore.user)
+let notificationInterval: ReturnType<typeof setInterval> | null = null
 
 // --- Initialisation ---
-onMounted(async () => {
+const loadNotifications = async () => {
   try {
-    if (!isLoggedIn.value) return
-    console.log('Erreur')
     const res = await notificationStore.getNotification()
     notifications.value = res?.data || []
   } catch (error) {
     console.error('Erreur de chargement des notifications:', error)
+  }
+}
+
+watch(
+  isLoggedIn,
+  async (logged) => {
+    if (!logged) {
+      // 🔴 stop polling si déconnexion
+      if (notificationInterval) {
+        clearInterval(notificationInterval)
+        notificationInterval = null
+      }
+      notifications.value = []
+      return
+    }
+
+    // 🟢 chargement immédiat
+    await loadNotifications()
+
+    // 🕔 polling toutes les 5 secondes
+    notificationInterval = setInterval(loadNotifications, 5000)
+  },
+  { immediate: true },
+)
+
+// 🧹 nettoyage quand le composant disparaît
+onUnmounted(() => {
+  if (notificationInterval) {
+    clearInterval(notificationInterval)
   }
 })
-setInterval(async () => {
-  try {
-    const res = await notificationStore.getNotification()
-    notifications.value = res?.data || []
-  } catch (error) {
-    console.error('Erreur de chargement des notifications:', error)
-  }
-}, 5000)
 
 // --- Fonctions utilitaires ---
 const formatType = (type: string) => {

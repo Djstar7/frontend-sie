@@ -445,7 +445,7 @@ const moveVisaPopover = (e: MouseEvent) => {
 
 const hideVisaPopover = () => {
   if (hideTimeout) clearTimeout(hideTimeout)
-  hideTimeout = window.setTimeout(() => {
+  hideTimeout = setTimeout(() => {
     visaPopoverVisible.value = false
     hoveredVisaId.value = null
     hoveredVisaDetails.value = null

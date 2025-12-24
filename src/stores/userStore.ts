@@ -31,12 +31,12 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function resetAuth() {
-    user.value = null
     isAuthenticated.value = false
     localStorage.removeItem('user')
     localStorage.removeItem('access_token')
     localStorage.removeItem('visarequestId')
     localStorage.removeItem('user_id')
+    user.value = null
   }
 
   async function redirectDashboard() {

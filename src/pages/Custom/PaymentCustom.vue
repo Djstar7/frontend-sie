@@ -89,23 +89,27 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div class="min-h-screen w-full bg-gray-50 flex flex-col p-4 md:p-6 max-w-full">
+  <div class="min-h-screen w-full bg-gray-50 flex flex-col p-3 sm:p-4 md:p-6 max-w-full">
+    <!-- Header -->
     <h2
-      class="text-2xl md:text-3xl justify-center font-bold mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-2 flex items-center gap-3 text-center"
+      class="text-xl sm:text-2xl md:text-3xl justify-center font-bold mb-4 sm:mb-6 text-indigo-700 border-b-2 border-indigo-200 pb-2 flex items-center gap-2 sm:gap-3 text-center"
     >
-      <i class="fas fa-wallet"></i> Gestion des Transactions
+      <i class="fas fa-wallet"></i>
+      <span class="hidden sm:inline">Gestion des Transactions</span>
+      <span class="sm:hidden">Transactions</span>
     </h2>
 
-    <div class="flex flex-wrap gap-4 w-full mb-6 items-center bg-white p-4 rounded-lg shadow-sm">
+    <!-- Filters -->
+    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full mb-4 sm:mb-6 bg-white p-3 sm:p-4 rounded-lg shadow-sm">
       <input
         type="text"
         v-model="filter"
-        placeholder="Rechercher (Nom, Email)"
-        class="flex-1 min-w-[250px] sm:min-w-[200px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
+        placeholder="Rechercher..."
+        class="flex-1 px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
       />
       <select
         v-model="filterStatus"
-        class="min-w-[150px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 capitalize transition duration-150 font-medium"
+        class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 capitalize transition duration-150 font-medium"
       >
         <option value="">Tous les statuts</option>
         <option value="completed">Payé</option>
@@ -114,115 +118,142 @@ onMounted(async () => {
       </select>
     </div>
 
-    <div
-      class="flex-1 overflow-y-auto overflow-x-auto bg-white rounded-lg shadow-xl border border-gray-200"
-    >
-      <table class="w-full border-collapse min-w-[700px] sm:min-w-full">
-        <thead class="sticky top-0 bg-indigo-100 z-10 border-b-2 border-indigo-300">
-          <tr>
-            <th
-              class="px-4 py-3 text-indigo-700 font-bold text-xs sm:text-sm tracking-wider uppercase"
+    <!-- Content -->
+    <div class="flex-1 bg-white rounded-lg shadow-xl border border-gray-200">
+      <!-- Mobile cards view -->
+      <div class="block md:hidden p-3 space-y-3">
+        <div
+          v-for="p in paginatedPayments"
+          :key="p.id"
+          class="bg-gray-50 rounded-lg p-4 border border-gray-200"
+        >
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="font-medium text-gray-900 text-sm truncate">{{ p.userName }}</p>
+              <p class="text-xs text-gray-500 truncate">{{ p.userEmail }}</p>
+            </div>
+            <span
+              :class="paymentStatusColors.get(p.status) + ' font-semibold px-2 py-1 rounded-full text-xs'"
             >
-              Date
-            </th>
-            <th
-              class="px-4 py-3 text-indigo-700 font-bold text-xs sm:text-sm tracking-wider uppercase"
+              {{ paymentStatusMap.get(p.status) }}
+            </span>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Date:</span>
+              <span class="font-medium text-gray-800">{{ formatDateDayMonthYear(p.created_at!) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Montant:</span>
+              <span class="font-bold text-gray-800">{{ p.amount }} {{ p.currency }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Méthode:</span>
+              <span class="text-gray-800 capitalize">{{ p.method }}</span>
+            </div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-gray-200">
+            <button
+              @click="confirmDelete(p.id!)"
+              class="w-full flex items-center justify-center gap-2 text-red-600 hover:bg-red-50 py-2 rounded-lg transition text-sm font-medium"
             >
-              Utilisateur
-            </th>
-            <th
-              class="px-4 py-3 text-indigo-700 font-bold text-xs sm:text-sm tracking-wider uppercase"
-            >
-              Montant
-            </th>
-            <th
-              class="px-4 py-3 text-indigo-700 font-bold text-xs sm:text-sm tracking-wider uppercase"
-            >
-              Méthode
-            </th>
-            <th
-              class="px-4 py-3 text-indigo-700 font-bold text-xs sm:text-sm tracking-wider uppercase"
-            >
-              Statut
-            </th>
-            <th
-              class="px-4 py-3 text-indigo-700 font-bold text-xs sm:text-sm tracking-wider uppercase"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <tr v-for="p in paginatedPayments" :key="p.id" class="transition duration-100">
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
-              {{ formatDateDayMonthYear(p.created_at!) }}
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm">
-              <div class="font-medium text-gray-900 truncate max-w-[150px]">{{ p.userName }}</div>
-              <div class="text-gray-500 text-xs truncate max-w-[150px]">{{ p.userEmail }}</div>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-800">
-              {{ p.amount }} <span class="text-xs text-gray-500">{{ p.currency }}</span>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-              {{ p.method }}
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap">
-              <span
-                :class="
-                  paymentStatusColors.get(p.status) +
-                  ' font-semibold px-3 py-1 rounded-full text-xs'
-                "
-              >
-                {{ paymentStatusMap.get(p.status) }}
-              </span>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap font-medium">
-              <div class="flex items-center text-lg gap-3">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        </div>
+        <div v-if="paginatedPayments.length === 0" class="text-center py-8 text-gray-400">
+          <i class="fas fa-info-circle mr-2"></i> Aucune transaction trouvée.
+        </div>
+      </div>
+
+      <!-- Desktop table view -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead class="sticky top-0 bg-indigo-100 z-10 border-b-2 border-indigo-300">
+            <tr>
+              <th class="px-3 lg:px-4 py-3 text-indigo-700 font-bold text-xs tracking-wider uppercase text-left">
+                Date
+              </th>
+              <th class="px-3 lg:px-4 py-3 text-indigo-700 font-bold text-xs tracking-wider uppercase text-left">
+                Utilisateur
+              </th>
+              <th class="px-3 lg:px-4 py-3 text-indigo-700 font-bold text-xs tracking-wider uppercase text-left">
+                Montant
+              </th>
+              <th class="px-3 lg:px-4 py-3 text-indigo-700 font-bold text-xs tracking-wider uppercase text-left">
+                Méthode
+              </th>
+              <th class="px-3 lg:px-4 py-3 text-indigo-700 font-bold text-xs tracking-wider uppercase text-left">
+                Statut
+              </th>
+              <th class="px-3 lg:px-4 py-3 text-indigo-700 font-bold text-xs tracking-wider uppercase text-left">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-100">
+            <tr v-for="p in paginatedPayments" :key="p.id" class="hover:bg-gray-50 transition duration-100">
+              <td class="px-3 lg:px-4 py-3 lg:py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
+                {{ formatDateDayMonthYear(p.created_at!) }}
+              </td>
+              <td class="px-3 lg:px-4 py-3 lg:py-4 whitespace-nowrap text-sm">
+                <div class="font-medium text-gray-900 truncate max-w-[120px] lg:max-w-[150px]">{{ p.userName }}</div>
+                <div class="text-gray-500 text-xs truncate max-w-[120px] lg:max-w-[150px]">{{ p.userEmail }}</div>
+              </td>
+              <td class="px-3 lg:px-4 py-3 lg:py-4 whitespace-nowrap text-sm font-bold text-gray-800">
+                {{ p.amount }} <span class="text-xs text-gray-500">{{ p.currency }}</span>
+              </td>
+              <td class="px-3 lg:px-4 py-3 lg:py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                {{ p.method }}
+              </td>
+              <td class="px-3 lg:px-4 py-3 lg:py-4 whitespace-nowrap">
+                <span
+                  :class="paymentStatusColors.get(p.status) + ' font-semibold px-2 lg:px-3 py-1 rounded-full text-xs'"
+                >
+                  {{ paymentStatusMap.get(p.status) }}
+                </span>
+              </td>
+              <td class="px-3 lg:px-4 py-3 lg:py-4 whitespace-nowrap font-medium">
                 <button
                   @click="confirmDelete(p.id!)"
-                  class="text-red-600 hover:text-red-800 transition"
+                  class="text-red-600 hover:text-red-800 transition text-lg"
                   title="Supprimer la transaction"
                 >
                   <i class="fas fa-trash"></i>
                 </button>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="paginatedPayments.length === 0">
-            <td colspan="7" class="text-center py-6 text-gray-400 font-medium text-lg">
-              <i class="fas fa-info-circle mr-2"></i> Aucune transaction trouvée correspondant aux
-              critères.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+            <tr v-if="paginatedPayments.length === 0">
+              <td colspan="6" class="text-center py-8 text-gray-400 font-medium">
+                <i class="fas fa-info-circle mr-2"></i> Aucune transaction trouvée.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
+    <!-- Pagination -->
     <div
-      class="flex justify-between items-center mt-6 px-4 py-3 bg-white rounded-lg shadow-md border border-gray-200 flex-wrap gap-3"
+      class="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 px-3 sm:px-4 py-3 bg-white rounded-lg shadow-md border border-gray-200 gap-3"
     >
       <button
         @click="prevPage"
         :disabled="currentPage === 1"
-        class="px-4 py-2 border rounded-full text-indigo-600 border-indigo-300 disabled:opacity-50 hover:bg-indigo-50 transition font-medium flex items-center gap-2 text-sm"
+        class="px-3 sm:px-4 py-2 border rounded-full text-indigo-600 border-indigo-300 disabled:opacity-50 hover:bg-indigo-50 transition font-medium flex items-center gap-2 text-sm w-full sm:w-auto justify-center"
       >
-        <i class="fas fa-arrow-left"></i> Précédent
+        <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Précédent</span>
       </button>
-      <span
-        class="text-gray-500 font-semibold text-sm sm:text-base order-first sm:order-none w-full sm:w-auto text-center"
-      >
+      <span class="text-gray-500 font-semibold text-sm text-center">
         Page {{ currentPage }} / {{ totalPages }}
-        <span class="text-xs sm:text-sm text-gray-500 ml-2"
-          >({{ filteredPayments.length }} résultats)</span
-        >
+        <span class="text-xs text-gray-500 ml-1 sm:ml-2">({{ filteredPayments.length }})</span>
       </span>
       <button
         @click="nextPage"
         :disabled="currentPage === totalPages"
-        class="px-4 py-2 border rounded-full text-indigo-600 border-indigo-300 disabled:opacity-50 hover:bg-indigo-50 transition font-medium flex items-center gap-2 text-sm"
+        class="px-3 sm:px-4 py-2 border rounded-full text-indigo-600 border-indigo-300 disabled:opacity-50 hover:bg-indigo-50 transition font-medium flex items-center gap-2 text-sm w-full sm:w-auto justify-center"
       >
-        Suivant <i class="fas fa-arrow-right"></i>
+        <span class="hidden sm:inline">Suivant</span> <i class="fas fa-arrow-right"></i>
       </button>
     </div>
 

@@ -82,7 +82,7 @@ onMounted(() => {
     <NavbarPartial class="fixed top-0 left-0 right-0 z-50" />
 
     <!-- Bouton retour -->
-    <div class="fixed top-[88px] left-4 sm:left-6 md:left-24 lg:left-72 z-40">
+    <!-- <div class="fixed top-[88px] left-4 sm:left-6 md:left-24 lg:left-72 z-40">
       <transition name="slide-left">
         <button
           v-if="canGoBack && router.currentRoute.value.name !== 'admin.dashboard'"
@@ -93,7 +93,7 @@ onMounted(() => {
           <i class="fas fa-arrow-left text-lg sm:text-xl"></i>
         </button>
       </transition>
-    </div>
+    </div> -->
 
     <!-- Bouton Notifications -->
     <div class="fixed top-[88px] right-3 sm:right-4 z-40" v-if="!isPanelOpen">

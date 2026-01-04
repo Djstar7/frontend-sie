@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { useUserStore } from '@/stores/userStore'
 import router from '@/router'
+const baseUR = 'http://127.0.0.1:8000'
 
 // Création de l'instance Axios
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8001/api',
+  baseURL: `${baseUR}/api`,
   headers: {
     Accept: 'application/json',
   },
@@ -54,4 +55,4 @@ const uploadEditFile = (url: string, formData: FormData) => {
   })
 }
 
-export { api, uploadFile, uploadEditFile }
+export { api, uploadFile, uploadEditFile, baseUR }

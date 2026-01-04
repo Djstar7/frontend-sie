@@ -5,6 +5,7 @@ import { useDocumentStore } from '@/stores/documentStore'
 import { useUserStore } from '@/stores/userStore'
 import type { Document } from '@/types/document'
 import UploadDocumentModal from './UploadDocumentModal.vue'
+import { baseUR } from '@/services/api'
 
 // Stores & route
 const route = useRoute()
@@ -24,7 +25,6 @@ const zoomLevel = ref(1)
 const rotation = ref(0)
 const cursor = ref({ x: 0, y: 0 })
 
-const baseURL = 'http://localhost:8000'
 // Fetch documents
 const fetchDocuments = async () => {
   loading.value = true
@@ -138,7 +138,7 @@ onMounted(fetchDocuments)
         >
           <img
             v-if="!doc.file_path.endsWith('.pdf')"
-            :src="`${baseURL}/storage/${doc.file_path}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`"
+            :src="`${baseUR}/storage/${doc.file_path}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`"
             class="w-full h-full object-cover"
             :alt="doc.name"
           />
@@ -171,14 +171,14 @@ onMounted(fetchDocuments)
         <!-- PDF -->
         <iframe
           v-if="selectedDoc.file_path.endsWith('.pdf')"
-          :src="`${baseURL}/storage/${selectedDoc.file_path}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`"
+          :src="`${baseUR}/storage/${selectedDoc.file_path}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`"
           class="w-full h-full rounded-xl border"
         ></iframe>
 
         <!-- Image -->
         <img
           v-else
-          :src="`${baseURL}/storage/${selectedDoc.file_path}`"
+          :src="`${baseUR}/storage/${selectedDoc.file_path}`"
           :alt="selectedDoc.name"
           class="max-w-full max-h-full object-contain transition-transform duration-150"
           :style="{

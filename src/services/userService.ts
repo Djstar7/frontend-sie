@@ -1,7 +1,38 @@
 import { api } from './api'
-import type { UserRegister, UserLogin, UserData } from '@/types/user'
+import type { UserRegister, UserLogin, UserData, FirebaseLoginData } from '@/types/user'
 
 export const userService = {
+  // =============================================
+  // Verification email par OTP
+  // =============================================
+
+  async sendEmailCode(email: string) {
+    const response = await api.post<{ message: string }>('/auth/email/send-code', { email })
+    return response.data
+  },
+
+  async resendEmailCode(email: string) {
+    const response = await api.post<{ message: string }>('/auth/email/resend-code', { email })
+    return response.data
+  },
+
+  async verifyEmailCode(email: string, code: string) {
+    const response = await api.post<{ message: string; verified: boolean }>(
+      '/auth/email/verify-code',
+      { email, code }
+    )
+    return response.data
+  },
+
+  async checkEmailVerified(email: string) {
+    const response = await api.post<{ verified: boolean }>('/auth/email/check-verified', { email })
+    return response.data
+  },
+
+  // =============================================
+  // Authentification
+  // =============================================
+
   async register(data: UserRegister) {
     const response = await api.post<{ message: string; user: UserRegister; access_token: string }>(
       '/auth/register',
@@ -18,8 +49,21 @@ export const userService = {
     return response.data
   },
 
+  async loginWithFirebase(data: FirebaseLoginData) {
+    const response = await api.post<{ message: string; user: UserRegister; access_token: string }>(
+      '/auth/firebase',
+      data,
+    )
+    return response.data
+  },
+
   async logout() {
     const response = await api.post<{ message: string }>('/auth/logout')
+    return response.data
+  },
+
+  async checkEmailExists(email: string) {
+    const response = await api.post<{ exists: boolean; message: string }>('/auth/check-email', { email })
     return response.data
   },
 
@@ -54,6 +98,49 @@ export const userService = {
 
   async deleteUser(id: string) {
     const response = await api.delete<{ message: string }>(`/user/delete/${id}`)
+    return response.data
+  },
+
+  async getMe() {
+    const response = await api.get<{ user: UserRegister }>('/auth/me')
+    return response.data
+  },
+
+  // =============================================
+  // Reinitialisation mot de passe
+  // =============================================
+
+  async sendPasswordResetLink(email: string) {
+    const response = await api.post<{ message: string }>('/auth/password/send-link', { email })
+    return response.data
+  },
+
+  async verifyPasswordResetToken(email: string, token: string) {
+    const response = await api.post<{ valid: boolean; email: string; message: string }>(
+      '/auth/password/verify-token',
+      { email, token }
+    )
+    return response.data
+  },
+
+  async resetPassword(email: string, token: string, password: string) {
+    const response = await api.post<{ message: string }>('/auth/password/reset', {
+      email,
+      token,
+      password,
+    })
+    return response.data
+  },
+
+  // =============================================
+  // Suppression de compte (RGPD)
+  // =============================================
+
+  async requestAccountDeletion(email: string, reason?: string) {
+    const response = await api.post<{ message: string }>('/auth/delete-account', {
+      email,
+      reason,
+    })
     return response.data
   },
 }

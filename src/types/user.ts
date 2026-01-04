@@ -9,10 +9,22 @@ interface UserRegister {
   password?: string
   image?: string
   role?: Role
+  firebase_uid?: string
 }
+
 interface UserLogin {
   email: string
   password: string
+  firebase_token?: string
+}
+
+interface FirebaseLoginData {
+  firebase_token: string
+  firebase_uid: string
+  email: string | null
+  name: string | null
+  photo_url: string | null
+  provider: string
 }
 interface UserForgotPassword {
   email: string
@@ -94,6 +106,7 @@ export type UserData = UserRegister & {
 export type {
   UserRegister,
   UserLogin,
+  FirebaseLoginData,
   Profil,
   UserState,
   UserForgotPassword,

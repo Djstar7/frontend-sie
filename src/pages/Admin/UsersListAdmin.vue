@@ -9,6 +9,7 @@ import EditUser from '@/components/EditUser.vue'
 import CreateUser from '@/components/CreateUser.vue'
 import DeleteModal from '@/components/DeleteModal.vue'
 import { statusMap } from '@/utils/dataMap'
+import DeleteModalCustom from '@/components/DeleteModalCustom.vue'
 
 const users = ref<UserRegister[]>([])
 const profils = ref<Record<string, Profil | null>>({})
@@ -496,9 +497,10 @@ const exportToCSV = () => {
         </div>
       </div>
 
-      <DeleteModal
+      <DeleteModalCustom
         v-if="isOpenDelete"
-        :val="'cet utilisateur'"
+        :message="'cet utilisateur'"
+        :confirmText="userData?.name ?? 'Utilisateur'"
         @close="isOpenDelete = false"
         @confirm="deleteUser(selectedId)"
       />

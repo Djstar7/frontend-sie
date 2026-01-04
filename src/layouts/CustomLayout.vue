@@ -84,7 +84,7 @@ onMounted(() => {
     <NavbarPartial class="fixed top-0 left-0 right-0 z-50" />
 
     <!-- Bouton retour - positionné différemment selon la taille d'écran -->
-    <div class="fixed top-[88px] left-4 sm:left-6 md:left-24 lg:left-72 z-40">
+    <div class="fixed top-[88px] hidden md:left-24 lg:left-72 z-40">
       <transition name="slide-left">
         <button
           v-if="canGoBack && router.currentRoute.value.name !== 'custom.dashboard'"
@@ -111,13 +111,13 @@ onMounted(() => {
     </div>
 
     <!-- Bouton hamburger mobile pour sidebar -->
-    <button
+    <!-- <button
       v-if="isMobile && !isMobileSidebarOpen"
       @click="toggleMobileSidebar"
       class="fixed top-[88px] left-0 z-50 bg-white shadow-lg py-3 px-2 rounded-r-xl text-blue-600 transition duration-300"
     >
       <i class="fas fa-chevron-right text-lg"></i>
-    </button>
+    </button> -->
 
     <div class="flex flex-1 pt-20">
       <!-- Sidebar Desktop/Tablet - toujours visible sur md+ -->

@@ -55,7 +55,9 @@ const submitVisaRequest = async () => {
   try {
     if (!visaData.value) return toastError('Aucun visa sélectionné')
 
-    const { id: userId } = userStore.user!
+    const userId = userStore.user?.id
+    if (!userId) return toastError('Utilisateur non connecté')
+
     const { user_id } = visaData.value
 
     if (userId !== user_id) {
@@ -64,9 +66,9 @@ const submitVisaRequest = async () => {
 
     const payload: VisaRequestPayload = {
       user_id: userId,
-      country_dest_name: visaData.value.country!,
-      visa_type_name: visaData.value.visa_type!,
-      nationality: visaData.value.nationality!,
+      country_dest_name: visaData.value.country ?? '',
+      visa_type_name: visaData.value.visa_type ?? '',
+      nationality: visaData.value.nationality ?? '',
     }
 
     let requestIdToUse: string

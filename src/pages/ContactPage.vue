@@ -1,25 +1,71 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { contactService } from '@/services/contactService'
+import { toastSuccess, toastError } from '@/utils/toastConfig'
 
 const name = ref('')
 const email = ref('')
 const subject = ref('')
 const message = ref('')
+const isSubmitting = ref(false)
 const submitted = ref(false)
+const errors = ref<Record<string, string>>({})
 
-const submitForm = () => {
-  console.log({
-    name: name.value,
-    email: email.value,
-    subject: subject.value,
-    message: message.value,
-  })
-  submitted.value = true
-  name.value = ''
-  email.value = ''
-  subject.value = ''
-  message.value = ''
-  setTimeout(() => (submitted.value = false), 5000)
+const validateForm = (): boolean => {
+  errors.value = {}
+
+  if (!name.value.trim()) {
+    errors.value.name = 'Le nom est obligatoire'
+  }
+
+  if (!email.value.trim()) {
+    errors.value.email = "L'email est obligatoire"
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    errors.value.email = "L'email n'est pas valide"
+  }
+
+  if (!subject.value.trim()) {
+    errors.value.subject = "L'objet est obligatoire"
+  }
+
+  if (!message.value.trim()) {
+    errors.value.message = 'Le message est obligatoire'
+  } else if (message.value.length < 10) {
+    errors.value.message = 'Le message doit contenir au moins 10 caracteres'
+  }
+
+  return Object.keys(errors.value).length === 0
+}
+
+const submitForm = async () => {
+  if (!validateForm()) return
+
+  isSubmitting.value = true
+  try {
+    const response = await contactService.send({
+      name: name.value,
+      email: email.value,
+      subject: subject.value,
+      message: message.value,
+    })
+
+    toastSuccess(response.message)
+    submitted.value = true
+
+    // Reset form
+    name.value = ''
+    email.value = ''
+    subject.value = ''
+    message.value = ''
+    errors.value = {}
+
+    setTimeout(() => (submitted.value = false), 5000)
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } }
+    toastError(error.response?.data?.message || "Une erreur est survenue lors de l'envoi du message")
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -47,46 +93,52 @@ const submitForm = () => {
               <input
                 v-model="name"
                 type="text"
-                required
                 placeholder="Votre nom"
-                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base"
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base"
+                :class="errors.name ? 'border-red-500' : 'border-gray-300'"
               />
+              <p v-if="errors.name" class="text-red-500 text-xs mt-1">{{ errors.name }}</p>
             </div>
             <div>
               <label class="block text-gray-700 font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Email</label>
               <input
                 v-model="email"
                 type="email"
-                required
                 placeholder="Votre email"
-                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base"
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base"
+                :class="errors.email ? 'border-red-500' : 'border-gray-300'"
               />
+              <p v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
             </div>
             <div>
               <label class="block text-gray-700 font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Objet</label>
               <input
                 v-model="subject"
                 type="text"
-                required
                 placeholder="Objet du message"
-                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base"
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base"
+                :class="errors.subject ? 'border-red-500' : 'border-gray-300'"
               />
+              <p v-if="errors.subject" class="text-red-500 text-xs mt-1">{{ errors.subject }}</p>
             </div>
             <div>
               <label class="block text-gray-700 font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Message</label>
               <textarea
                 v-model="message"
                 rows="4"
-                required
                 placeholder="Votre message"
-                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none text-sm sm:text-base"
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none text-sm sm:text-base"
+                :class="errors.message ? 'border-red-500' : 'border-gray-300'"
               ></textarea>
+              <p v-if="errors.message" class="text-red-500 text-xs mt-1">{{ errors.message }}</p>
             </div>
             <button
               type="submit"
-              class="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-transform hover:scale-105 text-sm sm:text-base"
+              :disabled="isSubmitting"
+              class="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-transform hover:scale-105 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              Envoyer
+              <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
+              {{ isSubmitting ? 'Envoi en cours...' : 'Envoyer' }}
             </button>
             <p v-if="submitted" class="text-green-500 mt-2 text-center font-semibold text-sm sm:text-base">
               Votre message a été envoyé avec succès !

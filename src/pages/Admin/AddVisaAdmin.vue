@@ -2,25 +2,39 @@
 import { ref, computed, onMounted } from 'vue'
 import { useCountryStore } from '@/stores/countryStore'
 import { useVisaTypeStore } from '@/stores/visaTypeStore'
+import { useListDocumentRequiredStore } from '@/stores/listDocumentRequiredStore'
 import { useRoute, useRouter } from 'vue-router'
 import type { VisaFetch, VisaType } from '@/types/visa'
 import { vOnClickOutside } from '@vueuse/components'
-import { documentRequest } from '@/utils/dataAdmin'
 import { validateForm, required } from '@/utils/validateForm'
 import { useVisaEligibilityStore } from '@/stores/useVisaEligibilityStore'
 import type { VisaResourceType } from '@/types/visa'
 import type { Country } from '@/types/country'
-import { toastSuccess } from '@/utils/toastConfig'
+import type { StatusMat } from '@/types/user'
+import { toastSuccess, toastError } from '@/utils/toastConfig'
+import ListDocumentRequiredManager from '@/components/Admin/ListDocumentRequiredManager.vue'
 
 const route = useRoute()
 const router = useRouter()
 const countryStore = useCountryStore()
 const visaTypeStore = useVisaTypeStore()
 const visaEligibilitiesStore = useVisaEligibilityStore()
+const listDocumentStore = useListDocumentRequiredStore()
 const visaId = route.params.id as string | undefined
 
 // isEditMode est vrai si visaId est présent (mode Modification)
 const isEditMode = computed(() => !!visaId)
+
+// Modal pour gerer les documents requis
+const isDocumentManagerOpen = ref(false)
+
+const openDocumentManager = () => {
+  isDocumentManagerOpen.value = true
+}
+
+const handleDocumentsUpdated = async () => {
+  await loadDocumentsFromApi()
+}
 
 const form = ref<VisaFetch>({
   country_name: '',
@@ -29,15 +43,78 @@ const form = ref<VisaFetch>({
   price_per_child: null,
   processing_duration_min: null,
   processing_duration_max: null,
-  status_mat: ['single', 'divorced'],
+  status_mat: [] as StatusMat[],
   min_age: 18,
-  max_age: 50,
+  max_age: 100,
   documents: [] as string[],
 })
 
 const countrys = ref<Country[]>([])
 const visaTypes = ref<VisaType[]>([])
 const errors = ref<Record<string, string[]>>({})
+const allDocuments = ref<Record<string, string[]>>({})
+
+// Options de statut matrimonial disponibles
+const statusMatOptions: { value: StatusMat; label: string }[] = [
+  { value: 'single', label: 'Célibataire' },
+  { value: 'married', label: 'Marié(e)' },
+  { value: 'divorced', label: 'Divorcé(e)' },
+  { value: 'widowed', label: 'Veuf/Veuve' },
+]
+
+// Toggle pour selectionner/deselectionner un statut
+const toggleStatusMat = (status: StatusMat) => {
+  const currentArray = Array.isArray(form.value.status_mat)
+    ? [...form.value.status_mat]
+    : form.value.status_mat ? [form.value.status_mat] : []
+
+  const index = currentArray.indexOf(status)
+  if (index > -1) {
+    currentArray.splice(index, 1)
+  } else {
+    currentArray.push(status)
+  }
+  form.value.status_mat = currentArray as StatusMat[]
+}
+
+// Verifier si un statut est selectionne
+const isStatusSelected = (status: StatusMat): boolean => {
+  if (Array.isArray(form.value.status_mat)) {
+    return form.value.status_mat.includes(status)
+  }
+  return form.value.status_mat === status
+}
+
+// Selectionner tous les statuts
+const selectAllStatus = () => {
+  form.value.status_mat = statusMatOptions.map(s => s.value) as StatusMat[]
+}
+
+// Deselectionner tous les statuts
+const clearAllStatus = () => {
+  form.value.status_mat = [] as StatusMat[]
+}
+
+// Computed pour verifier si le prix par enfant doit etre affiche
+const showPricePerChild = computed(() => {
+  if (Array.isArray(form.value.status_mat)) {
+    return form.value.status_mat.some(s => s !== 'single')
+  }
+  return form.value.status_mat !== 'single'
+})
+
+// Charger les documents depuis l'API
+const loadDocumentsFromApi = async () => {
+  try {
+    const response = await listDocumentStore.getGrouped(true)
+    if (response?.data) {
+      allDocuments.value = listDocumentStore.toSimpleGroupedFormat(response.data)
+    }
+  } catch (e) {
+    console.error('Erreur lors du chargement des documents:', e)
+    toastError('Erreur lors du chargement des documents requis')
+  }
+}
 
 const loadVisaData = async () => {
   if (!isEditMode.value) return
@@ -61,9 +138,9 @@ const loadVisaData = async () => {
       price_per_child: visa.price_per_child ? parseFloat(visa.price_per_child.toString()) : null,
       processing_duration_min: visa.processing_duration_min,
       processing_duration_max: visa.processing_duration_max,
-      status_mat: visa.status_mat,
-      min_age: visa.min_age,
-      max_age: visa.max_age,
+      status_mat: visa.status_mat ? [visa.status_mat] : [],
+      min_age: visa.min_age ?? 18,
+      max_age: visa.max_age ?? 100,
       documents: visa.documents || [],
     }
 
@@ -81,6 +158,9 @@ onMounted(async () => {
     ])
     countrys.value = resCountrys?.data || []
     visaTypes.value = resVisaType?.data || []
+
+    // Charger les documents requis depuis l'API
+    await loadDocumentsFromApi()
 
     await loadVisaData()
   } catch (e) {
@@ -142,14 +222,14 @@ function closeVisaDropdown() {
   }
 }
 
-const allDocuments: Record<string, string[]> = documentRequest
-
 // La logique des documents disponibles fonctionne maintenant correctement en mode Edit
 const availableDocuments = computed(() => {
   const result: Record<string, string[]> = {}
-  for (const category in allDocuments) {
+  for (const category in allDocuments.value) {
     // Les documents déjà sélectionnés (form.value.documents) ne sont pas dans les disponibles
-    result[category] = allDocuments[category].filter((doc) => !form.value.documents.includes(doc))
+    result[category] = allDocuments.value[category].filter(
+      (doc: string) => !form.value.documents.includes(doc),
+    )
   }
   return result
 })
@@ -319,7 +399,7 @@ const submitForm = async () => {
         <p v-if="errors.price_base" class="text-red-500 text-xs mt-1">{{ errors.price_base[0] }}</p>
       </div>
 
-      <div v-if="form.status_mat !== 'single'">
+      <div v-if="showPricePerChild">
         <label class="block text-lg text-gray-700 font-bold mb-2">Prix par enfant</label>
         <input
           v-model="form.price_per_child"
@@ -352,20 +432,50 @@ const submitForm = async () => {
         />
       </div>
 
-      <div>
+      <div class="md:col-span-2">
         <label class="block text-lg text-gray-700 font-bold mb-2">
           Statut matrimonial <span class="text-orange-400">*</span>
+          <span class="text-sm font-normal text-gray-500 ml-2">(sélection multiple possible)</span>
         </label>
-        <select
-          v-model="form.status_mat"
-          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-orange-400 text-sm"
-        >
-          <option value="">-- Sélectionner --</option>
-          <option value="single">Célibataire</option>
-          <option value="married">Marié</option>
-          <option value="divorced">Divorcé</option>
-          <option value="widowed">Veuf/Veuve</option>
-        </select>
+        <div class="flex flex-wrap gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
+          <button
+            v-for="option in statusMatOptions"
+            :key="option.value"
+            type="button"
+            @click="toggleStatusMat(option.value)"
+            :class="[
+              'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2',
+              isStatusSelected(option.value)
+                ? 'bg-orange-400 text-white border-orange-400 shadow-md'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-orange-300 hover:bg-orange-50'
+            ]"
+          >
+            <i
+              :class="[
+                'mr-2',
+                isStatusSelected(option.value) ? 'fas fa-check-circle' : 'far fa-circle'
+              ]"
+            ></i>
+            {{ option.label }}
+          </button>
+        </div>
+        <div class="flex gap-2 mt-2">
+          <button
+            type="button"
+            @click="selectAllStatus"
+            class="text-xs text-blue-600 hover:text-blue-800 underline"
+          >
+            Tout sélectionner
+          </button>
+          <span class="text-gray-400">|</span>
+          <button
+            type="button"
+            @click="clearAllStatus"
+            class="text-xs text-red-600 hover:text-red-800 underline"
+          >
+            Tout désélectionner
+          </button>
+        </div>
         <p v-if="errors.status_mat" class="text-red-500 text-xs mt-1">{{ errors.status_mat[0] }}</p>
       </div>
 
@@ -398,14 +508,25 @@ const submitForm = async () => {
       </div>
 
       <div class="md:col-span-2 border rounded-lg p-4 bg-gray-50">
-        <label class="block text-lg text-gray-700 font-bold mb-2">
-          Documents requis
-          <span class="text-orange-400">*</span>
-        </label>
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-lg text-gray-700 font-bold">
+            Documents requis
+            <span class="text-orange-400">*</span>
+          </label>
+          <button
+            type="button"
+            @click="openDocumentManager"
+            class="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors"
+          >
+            <i class="fas fa-cog"></i>
+            <span class="hidden sm:inline">Gerer les documents</span>
+            <span class="sm:hidden">Gerer</span>
+          </button>
+        </div>
         <div class="mb-4">
           <div v-for="(docs, category) in availableDocuments" :key="category" class="mb-4">
             <h3 class="text-sm font-semibold text-orange-500 mb-2 capitalize">
-              {{ category.replace('_', ' ') }}
+              {{ (category as string).replace(/_/g, ' ') }}
             </h3>
             <transition-group name="fade" tag="ul" class="flex flex-wrap gap-1">
               <li
@@ -453,6 +574,13 @@ const submitForm = async () => {
         </button>
       </div>
     </form>
+
+    <!-- Modal pour gerer les documents requis -->
+    <ListDocumentRequiredManager
+      :is-open="isDocumentManagerOpen"
+      @close="isDocumentManagerOpen = false"
+      @updated="handleDocumentsUpdated"
+    />
   </div>
 </template>
 

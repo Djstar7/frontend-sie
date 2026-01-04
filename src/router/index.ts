@@ -6,11 +6,14 @@ import { useUserStore } from '@/stores/userStore'
 import LoginPage from '@/pages/LoginPage.vue'
 import ForgotPasswordForm from '@/pages/ForgotPasswordForm.vue'
 import RegisterPage from '@/pages/RegisterPage.vue'
+import ResetPasswordPage from '@/pages/ResetPasswordPage.vue'
+import VerifyEmailPage from '@/pages/VerifyEmailPage.vue'
 
 // Pages publiques
 import HomePage from '@/pages/HomePage.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 import ContactPage from '@/pages/ContactPage.vue'
+import DeleteAccountPage from '@/pages/DeleteAccountPage.vue'
 
 // import AdminLayout from '@/layouts/AdminLayout.vue'
 
@@ -62,12 +65,15 @@ const router = createRouter({
     { path: '/', name: 'home', component: HomePage },
     { path: '/about', name: 'about', component: AboutPage },
     { path: '/contact', name: 'contact', component: ContactPage },
+    { path: '/delete-account', name: 'delete-account', component: DeleteAccountPage },
     {
       path: '/auth',
       children: [
         { path: 'login', name: 'auth.login', component: LoginPage },
         { path: 'register', name: 'auth.register', component: RegisterPage },
         { path: 'forgotpassword', name: 'auth.forgotpassword', component: ForgotPasswordForm },
+        { path: 'reset-password', name: 'auth.reset-password', component: ResetPasswordPage },
+        { path: 'verify-email', name: 'auth.verify-email', component: VerifyEmailPage },
       ],
     },
     {

@@ -42,20 +42,26 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-orange-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pays</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type de Visa</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix de Base</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée (Jours)</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pays</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type de Visa</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Âge</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-for="visa in paginatedEligibilities" :key="visa.id" class="hover:bg-gray-50 transition duration-100 cursor-pointer" @click="goToShow(visa.id)">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ visa.country || 'N/A' }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ visa.visa_type || 'N/A' }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-500 font-semibold">{{ formatCurrency(visa.price_base) }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ visa.processing_duration_min }} - {{ visa.processing_duration_max }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ visa.country || 'N/A' }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ visa.visa_type || 'N/A' }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm">
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-pink-100 text-pink-700">
+                {{ visa.status_mat ? (statusMap.get(visa.status_mat) || visa.status_mat) : 'N/A' }}
+              </span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ visa.min_age }} - {{ visa.max_age }} ans</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-orange-500 font-semibold">{{ formatCurrency(visa.price_base) }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div class="flex justify-end space-x-3 text-xl">
                 <button @click.stop="goToEdit(visa.id)" class="text-blue-600 hover:text-blue-700 transition" title="Éditer">
                   <i class="fas fa-edit"></i>
@@ -110,6 +116,7 @@ import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useVisaEligibilityStore } from '@/stores/useVisaEligibilityStore';
 import DeleteModalCustom from '@/components/DeleteModalCustom.vue';
+import { statusMap } from '@/utils/dataMap';
 
 const router = useRouter();
 const store = useVisaEligibilityStore();

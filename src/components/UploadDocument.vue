@@ -2,9 +2,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useDocumentStore } from '@/stores/documentStore'
 import { useVisaStore } from '@/stores/visaStore'
+import { useListDocumentRequiredStore } from '@/stores/listDocumentRequiredStore'
 import { useRouter, useRoute } from 'vue-router'
-import type { DocumentItem } from '@/types/document'
-import { allDocument } from '@/utils/data'
+import type { DocumentItem, ListDocumentRequiredGrouped } from '@/types/document'
 import { toastError, toastSuccess } from '@/utils/toastConfig'
 
 interface DocumentError {
@@ -13,6 +13,7 @@ interface DocumentError {
 
 const visaStore = useVisaStore()
 const documentStore = useDocumentStore()
+const listDocumentStore = useListDocumentRequiredStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -21,12 +22,14 @@ const docErrors = ref<DocumentError>({})
 const documentRecieve = ref<string[] | undefined>([])
 const visaRequestId = ref<string>('')
 const isSubmitting = ref(false)
+const allDocumentsMap = ref<Record<string, DocumentItem[]>>({})
+const isLoading = ref(true)
 
-onMounted(() => {
+onMounted(async () => {
   visaRequestId.value = route.params.visaRequestId as string
 
   if (!visaRequestId.value) {
-    toastError('Aucun ID trouvé. Reprenez la procédure.')
+    toastError('Aucun ID trouve. Reprenez la procedure.')
     router.push({ name: 'custom.visarequest.create' })
     return
   }
@@ -34,17 +37,30 @@ onMounted(() => {
   documentRecieve.value = visaStore.visa.value?.documents || []
 
   if (documentRecieve.value.length === 0) {
-    toastError('Aucun document requis trouvé pour cette demande.')
+    toastError('Aucun document requis trouve pour cette demande.')
+  }
+
+  // Charger les documents depuis l'API
+  try {
+    const response = await listDocumentStore.getGrouped(true)
+    if (response?.data) {
+      allDocumentsMap.value = listDocumentStore.toDocumentItemGroupedFormat(
+        response.data as ListDocumentRequiredGrouped,
+      )
+    }
+  } catch (e) {
+    console.error('Erreur lors du chargement des documents:', e)
+    toastError('Erreur lors du chargement des documents requis')
+  } finally {
+    isLoading.value = false
   }
 })
-
-const allDocumentsMap: Record<string, DocumentItem[]> = allDocument
 
 const requiredDocs = computed(() => {
   const result: Record<string, DocumentItem[]> = {}
 
-  for (const category in allDocumentsMap) {
-    const filtered = allDocumentsMap[category].filter((doc) =>
+  for (const category in allDocumentsMap.value) {
+    const filtered = allDocumentsMap.value[category].filter((doc) =>
       documentRecieve.value?.includes(doc.name),
     )
 
@@ -159,12 +175,18 @@ const submitLater = () => {
         class="text-3xl md:text-4xl font-extrabold text-gray-800 flex items-center justify-center gap-3"
       >
         <i class="fas fa-cloud-upload-alt text-purple-600"></i>
-        Téléversement des Documents
+        Televersement des Documents
       </h1>
-      <p class="text-gray-500 mt-2 text-lg">Veuillez uploader chaque document listé ci-dessous.</p>
+      <p class="text-gray-500 mt-2 text-lg">Veuillez uploader chaque document liste ci-dessous.</p>
     </header>
 
-    <div class="space-y-10">
+    <!-- Loading state -->
+    <div v-if="isLoading" class="flex items-center justify-center py-20">
+      <i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i>
+      <span class="ml-3 text-gray-600">Chargement des documents...</span>
+    </div>
+
+    <div v-else class="space-y-10">
       <div
         v-for="(docs, category) in requiredDocs"
         :key="category"

@@ -1,6 +1,5 @@
 import type { VisaFetch, VisaResourceType } from "@/types/visa";
 import { api } from "./api";
-import type { StatusMat } from "@/types/user";
 
 export interface PaginatorResponse {
     data: VisaResourceType[];
@@ -29,8 +28,8 @@ export class VisaEligibilityService {
         return response.data;
     }
 
-    async getEligibilityDetails(id: string): Promise<{ data: VisaResourceType & { status_mat: StatusMat, min_age: number, max_age: number }, message: string }> {
-        const response = await api.get<{ data: VisaResourceType & { min_age: number, max_age: number }, message: string }>(`${this.endpoint}/show/${id}`);
+    async getEligibilityDetails(id: string): Promise<{ data: VisaResourceType, message: string }> {
+        const response = await api.get<{ data: VisaResourceType, message: string }>(`${this.endpoint}/show/${id}`);
         return response.data;
     }
 

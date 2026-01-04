@@ -50,11 +50,13 @@ interface VisaRequest {
 
 interface VisaResourceType {
   id: string
-  user_id: string
+  user_id?: string
   country: string | null
-  nationality: string | null
+  nationality?: string | null
   visa_type: string | null
-  status_mat: StatusMat
+  status_mat: StatusMat | null
+  min_age: number | null
+  max_age: number | null
   price_base: number
   price_per_child?: number
   processing_duration_min: number

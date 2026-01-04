@@ -22,7 +22,9 @@
               class="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl shadow-2xl border border-blue-100"
             >
               <div
-                v-for="(img, idx) in certImages"
+                v-for="(img, idx) in [Certf1,
+  Certf2,
+  Certf3]"
                 :key="idx"
                 class="p-3 bg-white rounded-lg shadow-inner flex justify-center items-center"
               >
@@ -305,6 +307,9 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useAvisStore } from '@/stores/avisStore'
 import { useUserStore } from '@/stores/userStore'
 import type { Avis as AvisType } from '@/types/avis'
+import Certf1 from '@/assets/images/cert1.png'
+import Certf2 from '@/assets/images/cert-2.jpg'
+import Certf3 from '@/assets/images/cert-3.jpg'
 // Assurez-vous d'avoir ce composant ou remplacez-le par une confirmation native
 // import DeleteModal from './DeleteModal.vue'
 
@@ -347,12 +352,6 @@ const editingReview = ref<Avis>({
   user_id: '',
   name: '',
 })
-
-const certImages = [
-  '/src/assets/images/cert1.png',
-  '/src/assets/images/cert-2.jpg',
-  '/src/assets/images/cert-3.jpg',
-]
 
 function selectRating(n: number) {
   newAvisTempRating.value = n

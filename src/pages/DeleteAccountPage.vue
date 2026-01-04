@@ -1,21 +1,28 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { userService } from '@/services/userService'
-import { useUserStore } from '@/stores/userStore'
 import { validateForm, isEmail, required } from '@/utils/validateForm'
 import { toastSuccess, toastError } from '@/utils/toastConfig'
+import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
+const isLoading = ref(false)
+const requestSent = ref(false)
 
 const form = reactive({
   email: '',
   reason: '',
 })
 
-const isLoading = ref(false)
-const requestSent = ref(false)
 const errors = reactive({
   email: '',
+})
+
+// Pré-remplir l'email au montage du composant
+onMounted(() => {
+  if (userStore.user?.email) {
+    form.email = userStore.user.email
+  }
 })
 
 const validate = () => {
@@ -46,32 +53,12 @@ const handleSubmit = async () => {
   try {
     await userService.requestAccountDeletion(form.email, form.reason)
     requestSent.value = true
-    toastSuccess('Demande de suppression envoyee')
+    toastSuccess('Demande de suppression envoyée')
   } catch (err: unknown) {
     const axiosError = err as { response?: { data?: { message?: string } } }
     const message = axiosError.response?.data?.message || 'Erreur lors de la demande'
     toastError(message)
     errors.email = message
-  } finally {
-    isLoading.value = false
-  }
-}
-
-const handleLogoutAndDelete = async () => {
-  if (!validate()) return
-
-  isLoading.value = true
-  try {
-    await userService.requestAccountDeletion(form.email, form.reason)
-    if (userStore.isAuthenticated) {
-      await userStore.logout()
-    }
-    requestSent.value = true
-    toastSuccess('Demande de suppression envoyee')
-  } catch (err: unknown) {
-    const axiosError = err as { response?: { data?: { message?: string } } }
-    const message = axiosError.response?.data?.message || 'Erreur lors de la demande'
-    toastError(message)
   } finally {
     isLoading.value = false
   }
@@ -88,37 +75,35 @@ const handleLogoutAndDelete = async () => {
           </div>
           <h1 class="text-2xl font-bold text-gray-800 mb-2">Suppression de compte</h1>
           <p class="text-gray-600 text-sm">
-            Conformement au RGPD et aux politiques de confidentialite, vous pouvez demander la suppression de vos donnees personnelles.
+            Conformément au RGPD et aux politiques de confidentialité, vous pouvez demander la suppression de vos données personnelles.
           </p>
         </div>
 
-        <!-- Demande envoyee -->
         <template v-if="requestSent">
           <div class="text-center py-8">
             <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <i class="fas fa-check-circle text-green-600 text-3xl"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Demande recue !</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Demande reçue !</h3>
             <p class="text-gray-600 text-sm mb-4">
-              Votre demande de suppression de compte a ete enregistree. Notre equipe traitera votre demande dans un delai de 30 jours.
+              Votre demande de suppression de compte a été enregistrée. Notre équipe traitera votre demande dans un délai de 30 jours.
             </p>
             <p class="text-gray-500 text-xs">
-              Vous recevrez une confirmation par email une fois la suppression effectuee.
+              Vous recevrez une confirmation par email une fois la suppression effectuée.
             </p>
           </div>
         </template>
 
-        <!-- Formulaire de demande -->
         <template v-else>
           <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <div class="flex items-start gap-3">
               <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
               <div class="text-sm text-yellow-800">
                 <p class="font-medium mb-1">Attention</p>
-                <p>La suppression de votre compte entrainera :</p>
+                <p>La suppression de votre compte entraînera :</p>
                 <ul class="list-disc list-inside mt-2 space-y-1">
-                  <li>La suppression definitive de toutes vos donnees personnelles</li>
-                  <li>La perte de l'acces a vos demandes de visa</li>
+                  <li>La suppression définitive de toutes vos données personnelles</li>
+                  <li>La perte de l'accès à vos services en cours</li>
                   <li>La suppression de votre historique de documents</li>
                 </ul>
               </div>
@@ -128,21 +113,19 @@ const handleLogoutAndDelete = async () => {
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div class="relative">
               <label for="email" class="block text-sm font-medium text-gray-700">
-                Email du compte a supprimer
+                Email du compte à supprimer
               </label>
-              <i class="fas fa-envelope absolute left-3 top-9 text-gray-400 text-sm"></i>
-              <input
-                type="email"
-                id="email"
-                v-model="form.email"
-                placeholder="votre@email.com"
-                :class="[
-                  'mt-1 block w-full pl-9 px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none',
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
-                ]"
-              />
+              <div class="relative mt-1">
+                <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-sm"></i>
+                <input
+                  type="email"
+                  id="email"
+                  v-model="form.email"
+                  disabled
+                  placeholder="votre@email.com"
+                  class="block w-full pl-9 px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed text-blue-700 focus:outline-none"
+                />
+              </div>
               <p v-if="errors.email" class="text-red-600 text-xs mt-1">{{ errors.email }}</p>
             </div>
 
@@ -178,11 +161,11 @@ const handleLogoutAndDelete = async () => {
             <div class="space-y-3 text-sm text-gray-600">
               <p>
                 <i class="fas fa-envelope mr-2 text-indigo-500"></i>
-                Contactez-nous par email : <a href="mailto:support@sie-visa.com" class="text-indigo-600 hover:underline">support@sie-visa.com</a>
+                Contactez-nous par email : <a href="mailto:support@votre-domaine.com" class="text-indigo-600 hover:underline">support@votre-domaine.com</a>
               </p>
               <p>
                 <i class="fas fa-clock mr-2 text-indigo-500"></i>
-                Delai de traitement : 30 jours maximum
+                Délai de traitement : 30 jours maximum
               </p>
             </div>
           </div>
@@ -193,13 +176,13 @@ const handleLogoutAndDelete = async () => {
             :to="{ name: 'home' }"
             class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
           >
-            <i class="fas fa-arrow-left mr-1"></i> Retour a l'accueil
+            <i class="fas fa-arrow-left mr-1"></i> Retour à l'accueil
           </router-link>
         </div>
       </div>
 
       <div class="mt-6 text-center text-xs text-gray-500">
-        <p>Cette page est conforme aux exigences du RGPD et des politiques de confidentialite de Meta/Facebook.</p>
+        <p>Cette page est conforme aux exigences du RGPD et des politiques de confidentialité de Meta/Google.</p>
       </div>
     </div>
   </div>

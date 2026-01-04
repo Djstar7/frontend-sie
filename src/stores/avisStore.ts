@@ -11,8 +11,8 @@ export function useAvisStore() {
     try {
       const response = await avisService.getAvis()
       return response
-    } catch (err) {
-      // loading.handleError(err, 'Échec du chargement')
+    } catch {
+      // Silently fail - loading will stop in finally
     } finally {
       loading.stopLoading()
     }

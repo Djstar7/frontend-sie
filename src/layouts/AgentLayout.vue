@@ -81,19 +81,22 @@ onMounted(() => {
   <div class="min-h-screen flex flex-col bg-gray-50">
     <NavbarPartial class="fixed top-0 left-0 right-0 z-50" />
 
-    <!-- Bouton retour -->
-    <!-- <div class="fixed top-[88px] left-4 sm:hidden md:left-24 lg:left-72 z-40">
+    <!-- Bouton retour - uniquement sur desktop (les mobiles ont leur propre bouton retour) -->
+    <div class="hidden lg:block fixed top-[88px] lg:left-72 z-40">
       <transition name="slide-left">
         <button
           v-if="canGoBack && router.currentRoute.value.name !== 'agent.users'"
           @click="goBack"
-          class="p-2 sm:p-3 rounded-full bg-white text-gray-700 cursor-pointer shadow-lg hover:bg-gray-100 transition duration-200"
-          title="Retour"
+          class="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 cursor-pointer shadow-lg hover:shadow-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
+          title="Retour à la page précédente"
         >
-          <i class="fas fa-arrow-left text-lg sm:text-xl"></i>
+          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-500 transition-colors duration-300">
+            <i class="fas fa-arrow-left text-blue-600 group-hover:text-white transition-colors duration-300"></i>
+          </span>
+          <span class="text-sm font-medium text-gray-600 group-hover:text-blue-600 transition-colors duration-300">Retour</span>
         </button>
       </transition>
-    </div> -->
+    </div>
 
     <!-- Bouton Notifications -->
     <div class="fixed top-[88px] right-3 sm:right-4 z-40" v-if="!isPanelOpen">

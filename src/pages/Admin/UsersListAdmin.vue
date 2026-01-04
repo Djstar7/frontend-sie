@@ -7,7 +7,6 @@ import { useProfilStore } from '@/stores/profilStore'
 import { toastSuccess } from '@/utils/toastConfig'
 import EditUser from '@/components/EditUser.vue'
 import CreateUser from '@/components/CreateUser.vue'
-import DeleteModal from '@/components/DeleteModal.vue'
 import { statusMap } from '@/utils/dataMap'
 import DeleteModalCustom from '@/components/DeleteModalCustom.vue'
 
@@ -146,7 +145,7 @@ onMounted(fetchUsers)
 // --- FONCTIONNALITÉ D'EXPORTATION CSV ---
 
 // Fonction utilitaire pour convertir un tableau d'objets en chaîne CSV
-const convertToCSV = (data: any[]) => {
+const convertToCSV = (data: UserRegister[]) => {
   const headers = [
     'Nom complet',
     "Nom d'utilisateur",
@@ -174,7 +173,7 @@ const convertToCSV = (data: any[]) => {
       const email = sanitize(user.email)
       const phone = sanitize(profil?.phone)
       const role = sanitize(user.role)
-      const statusMat = sanitize(statusMap.get(profil?.status_mat!))
+      const statusMat = sanitize(profil?.status_mat ? statusMap.get(profil.status_mat) : undefined)
       const nationality = sanitize(profil?.nationality)
 
       // Utilisez le point-virgule (;) comme séparateur pour éviter les conflits avec les virgules dans les données

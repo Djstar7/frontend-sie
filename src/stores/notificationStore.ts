@@ -9,8 +9,8 @@ export function useNotificationStore() {
     loading.startLoading('Chargement des notifications...')
     try {
       return await notificationService.getNotifications()
-    } catch (err) {
-      // loading.handleError(err, 'Impossible de récupérer les notifications')
+    } catch {
+      // Silently fail - loading will stop in finally
     } finally {
       loading.stopLoading()
     }

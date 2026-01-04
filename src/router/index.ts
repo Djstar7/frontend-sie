@@ -82,6 +82,7 @@ const router = createRouter({
       children: [
         { path: 'dashboard', name: 'custom.dashboard', component: DashboardCustom },
         { path: 'appoitment', name: 'custom.appoitment', component: AppoitmentCustom },
+        { path: 'delete-account', name: 'custom.delete-account', component: DeleteAccountPage },
         {
           path: 'chat/:visaRequestId?',
           name: 'custom.chat',

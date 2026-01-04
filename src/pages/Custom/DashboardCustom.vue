@@ -347,14 +347,17 @@ const userStore = useUserStore()
 const paymentStore = usePaymentStore()
 
 /* ---------- Chart.js (dynamic import) ---------- */
-let Chart: any = null
+import type { Chart as ChartType } from 'chart.js'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Chart: typeof ChartType | any = null
 import('chart.js/auto').then((m) => {
   Chart = m.default ?? m
 })
 
 /* ---------- Refs / State ---------- */
 const pieChartRef: Ref<HTMLCanvasElement | null> = ref(null)
-let pieChart: any = null
+let pieChart: ChartType | null = null
 
 const loadingRequests = ref(true)
 const visaRequests = ref<VisaRequest[]>([])

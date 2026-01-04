@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useListDocumentRequiredStore } from '@/stores/listDocumentRequiredStore'
 import type { ListDocumentRequired, ListDocumentRequiredForm } from '@/types/document'
-import { toastSuccess } from '@/utils/toastConfig'
 
 const props = defineProps<{
   isOpen: boolean

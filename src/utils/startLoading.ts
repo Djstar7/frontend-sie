@@ -14,8 +14,8 @@ export const useLoading = () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  const startLoading = (message: string) => {
-    // toastInfo(message)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const startLoading = (message?: string) => {
     loading.value = true
     error.value = null
   }

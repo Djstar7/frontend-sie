@@ -277,7 +277,10 @@ import { visaRequestStatusColors, visaRequestStatusMap } from '@/utils/dataMap'
 import router from '@/router'
 
 // Chart.js imports
-let Chart: any
+import type { Chart as ChartType } from 'chart.js'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Chart: typeof ChartType | any
 
 // Dynamically import Chart.js to avoid build issues
 import('chart.js/auto').then((module) => {
@@ -297,11 +300,11 @@ const visaTypeDoughnutRef = ref<HTMLCanvasElement | null>(null) // CHANGEMENT: D
 const paymentAreaChartRef = ref<HTMLCanvasElement | null>(null) // Area Chart
 const visaRequestStatsRef = ref<HTMLCanvasElement | null>(null) // Bar Chart (conservé)
 
-let statusPolarChart: any = null
-let userHorizontalBarChart: any = null
-let visaTypeDoughnutChart: any = null // CHANGEMENT: Nouvelle instance de graphique
-let paymentAreaChart: any = null
-let visaRequestStatsChart: any = null
+let statusPolarChart: ChartType | null = null
+let userHorizontalBarChart: ChartType | null = null
+let visaTypeDoughnutChart: ChartType | null = null
+let paymentAreaChart: ChartType | null = null
+let visaRequestStatsChart: ChartType | null = null
 
 // Données réelles (à partir des stores)
 const visaRequests = ref<VisaRequest[]>([])
@@ -646,15 +649,15 @@ const createVisaTypeDoughnutChart = () => {
             borderWidth: 1,
             cornerRadius: 6,
             callbacks: {
-              label: function (context: any) {
+              label: function (context: { label?: string; parsed?: number; dataset?: { data: number[] } }) {
                 let label = context.label || ''
                 if (label) {
                   label += ': '
                 }
-                if (context.parsed !== null) {
+                if (context.parsed != null && context.dataset) {
                   label += context.parsed
                   const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
-                  const percentage = Math.round((context.parsed / total) * 100)
+                  const percentage = total > 0 ? Math.round((context.parsed / total) * 100) : 0
                   label += ` (${percentage}%)`
                 }
                 return label
@@ -763,7 +766,7 @@ const createPaymentAreaChart = () => {
             beginAtZero: true,
             grid: { color: 'rgba(0, 0, 0, 0.05)' },
             ticks: {
-              callback: (value: any) => value.toLocaleString('fr-CM') + ' XAF',
+              callback: (value: string | number) => Number(value).toLocaleString('fr-CM') + ' XAF',
               color: 'rgba(0, 0, 0, 0.7)',
             },
           },

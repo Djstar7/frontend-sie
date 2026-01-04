@@ -1,7 +1,7 @@
 <template>
-  <div class="flex md:h-[87vh] overflow-hidden bg-gray-100 antialiased text-sm">
+  <div class="flex md:h-[87vh] overflow-hidden antialiased text-sm">
     <aside
-      class="flex-shrink-0 flex-col w-full xs:w-72 sm:w-64 md:w-10 lg:w-40 xl:w-60 border-r border-gray-200 bg-white shadow-xl shadow-gray-200/50 transition-all duration-300 absolute md:relative z-40 h-full"
+      class="flex-shrink-0 flex-col w-full xs:w-72 sm:w-64 md:w-10 lg:w-40 xl:w-60 border-r border-gray-200  shadow-xl shadow-gray-200/50 transition-all duration-300 absolute md:relative z-20 pt-7 h-full"
       :class="{
         flex: showList,
         'hidden md:flex': !showList,

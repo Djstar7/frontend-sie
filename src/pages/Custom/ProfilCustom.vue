@@ -7,7 +7,6 @@ import EditUser from '@/components/EditUser.vue'
 import type { Custom, Profil, StatusMat, UserRegister } from '@/types/user'
 import { statusMap } from '@/utils/dataMap'
 
-
 const userStore = useUserStore()
 const profilStore = useProfilStore()
 
@@ -17,6 +16,7 @@ const profil = ref<Profil | null>(null)
 const loading = ref(false)
 const isOpenModalEdit = ref(false)
 const dataSend = ref<Custom>()
+
 
 
 const userInitials = computed(() => {
@@ -146,6 +146,32 @@ onMounted(loadUser)
           </div>
         </div>
       </div>
+
+      <!-- Section Suppression de compte -->
+      <div class="border-t border-gray-200 p-4 sm:p-6 md:p-8 lg:p-12">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-user-slash text-red-600 text-lg sm:text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-semibold text-red-800">Supprimer mon compte</h3>
+                <p class="text-xs sm:text-sm text-red-600 mt-1">
+                  Cette action est irreversible. Toutes vos donnees seront supprimees definitivement.
+                </p>
+              </div>
+            </div>
+            <router-link
+              :to="{ name: 'delete-account' }"
+              class="px-4 sm:px-6 py-2 sm:py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
+            >
+              <i class="fas fa-trash-alt"></i>
+              <span>Supprimer</span>
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Loader -->
@@ -174,5 +200,6 @@ onMounted(loadUser)
         />
       </div>
     </div>
+
   </section>
 </template>
